@@ -44,6 +44,14 @@ service:
     type: NodePort
     nodePort: 30300                # reach it from your host at http://<node-ip>:30300
 
+# Pin to the tainted control-plane server, out of the application's failure domain.
+# The local-path PVC is created on the node that runs the pod, so it lives there too.
+nodeSelector:
+  node-role.kubernetes.io/control-plane: "true"
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+
 resources:
   requests:
     cpu: 100m

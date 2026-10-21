@@ -4,7 +4,7 @@ source "$(dirname "$0")/lib/common.sh"
 load_config
 
 log "VMs"
-for vm in "$SERVER_VM" "$AGENT_VM"; do
+for vm in "${ALL_VMS[@]}"; do
   if vm_exists "$vm"; then
     printf '  %-12s %-10s %s\n' "$vm" "$(vm_state "$vm")" "$(vm_ip "$vm")"
   else
@@ -17,8 +17,8 @@ kc get nodes >/dev/null 2>&1 || { warn "context '$KUBE_CONTEXT' unreachable"; ex
 log "Nodes"
 kc get nodes -o wide
 log "Platform pods"
-kc get pods -n gitea 2>/dev/null || true
-kc get pods -n argocd 2>/dev/null || true
+kc get pods -n gitea -o wide 2>/dev/null || true
+kc get pods -n argocd -o wide 2>/dev/null || true
 
 NODE_IP="$(vm_ip "$SERVER_VM")"
 argocd_pw="$(kc -n argocd get secret argocd-initial-admin-secret \

@@ -24,7 +24,7 @@ status: ## Show VMs, nodes, platform pods and access URLs
 
 down: ## Gracefully shut down the VMs (keeps everything)
 	@source $(S)/lib/common.sh && load_config && \
-	for vm in $$AGENT_VM $$SERVER_VM; do \
+	for vm in "$${AGENTS[@]}" $$SERVER_VM; do \
 	  [[ "$$(vm_state $$vm)" == running ]] && "$${VIRSH[@]}" shutdown $$vm || true; \
 	done
 
