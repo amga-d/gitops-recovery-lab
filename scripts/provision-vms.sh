@@ -13,10 +13,11 @@ SSH_PUBKEY_FILE="${SSH_PUBKEY_FILE/#\~/$HOME}"
 SSH_PUBKEY="$(<"$SSH_PUBKEY_FILE")"
 
 # Only these variables are substituted; anything else in the templates is left alone.
-TEMPLATE_VARS='${SERVER_VM} ${AGENT_VM} ${SERVER_SSH_USER} ${AGENT_SSH_USER} ${SSH_PUBKEY}
-${K3S_VERSION} ${K3S_TOKEN} ${CLUSTER_CIDR} ${CALICO_VERSION} ${SERVER_IP}'
-export SERVER_VM AGENT_VM SERVER_SSH_USER AGENT_SSH_USER SSH_PUBKEY \
-  K3S_VERSION K3S_TOKEN CLUSTER_CIDR CALICO_VERSION
+# VM_NAME is the VM being rendered, so one agent template serves every agent.
+TEMPLATE_VARS='${SERVER_VM} ${VM_NAME} ${SERVER_SSH_USER} ${AGENT_SSH_USER} ${SSH_PUBKEY}
+${K3S_VERSION} ${K3S_TOKEN} ${CLUSTER_CIDR} ${CALICO_VERSION} ${SERVER_IP} ${SERVER_NODE_TAINT}'
+export SERVER_VM SERVER_SSH_USER AGENT_SSH_USER SSH_PUBKEY \
+  K3S_VERSION K3S_TOKEN CLUSTER_CIDR CALICO_VERSION SERVER_NODE_TAINT
 
 ensure_base_image() {
   [[ -f "$BASE_IMAGE" ]] && return
@@ -26,9 +27,9 @@ ensure_base_image() {
   mv "$BASE_IMAGE.part" "$BASE_IMAGE"
 }
 
-# ensure_vm <name> <role: server|agent>
+# ensure_vm <name> <role: server|agent> <memory-mb> <vcpus>
 ensure_vm() {
-  local vm=$1 role=$2
+  local vm=$1 role=$2 memory=$3 vcpus=$4
   if vm_exists "$vm"; then
     if [[ "$(vm_state "$vm")" == running ]]; then
       log "$vm already running"
@@ -41,31 +42,35 @@ ensure_vm() {
 
   ensure_base_image
   log "Creating VM $vm"
-  mkdir -p "$RENDER_DIR/$role" "$DISK_DIR"
+  # Rendered per VM, not per role, so agents don't overwrite each other's files.
+  local out="$RENDER_DIR/$vm"
+  mkdir -p "$out" "$DISK_DIR"
   local disk="$DISK_DIR/$vm.qcow2"
   local tmpl="$ROOT/infra/cloud-init/$role"
-  envsubst "$TEMPLATE_VARS" <"$tmpl/user-data.yaml.tmpl" >"$RENDER_DIR/$role/user-data.yaml"
-  envsubst "$TEMPLATE_VARS" <"$tmpl/meta-data.yaml.tmpl" >"$RENDER_DIR/$role/meta-data.yaml"
+  VM_NAME=$vm envsubst "$TEMPLATE_VARS" <"$tmpl/user-data.yaml.tmpl" >"$out/user-data.yaml"
+  VM_NAME=$vm envsubst "$TEMPLATE_VARS" <"$tmpl/meta-data.yaml.tmpl" >"$out/meta-data.yaml"
 
   # Absolute backing path so the overlay works from any directory.
   sudo qemu-img create -q -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$disk" "$VM_DISK_SIZE"
 
   sudo virt-install --connect qemu:///system \
     --name "$vm" \
-    --memory "$VM_MEMORY_MB" --vcpus "$VM_VCPUS" \
+    --memory "$memory" --vcpus "$vcpus" \
     --disk "path=$disk,format=qcow2" \
-    --cloud-init "user-data=$RENDER_DIR/$role/user-data.yaml,meta-data=$RENDER_DIR/$role/meta-data.yaml" \
+    --cloud-init "user-data=$out/user-data.yaml,meta-data=$out/meta-data.yaml" \
     --os-variant "$VM_OS_VARIANT" \
     --network "network=$VM_NETWORK" \
     --import --graphics none --noautoconsole
 }
 
-ensure_vm "$SERVER_VM" server
+ensure_vm "$SERVER_VM" server "$SERVER_MEMORY_MB" "$SERVER_VCPUS"
 
 log "Waiting for $SERVER_VM to get an IP"
 SERVER_IP="$(wait_vm_ip "$SERVER_VM")"
 export SERVER_IP
 log "$SERVER_VM IP: $SERVER_IP"
 
-# The agent's cloud-init needs the server IP, so it is created second.
-ensure_vm "$AGENT_VM" agent
+# The agents' cloud-init needs the server IP, so they are created after it.
+for agent in "${AGENTS[@]}"; do
+  ensure_vm "$agent" agent "$AGENT_MEMORY_MB" "$AGENT_VCPUS"
+done

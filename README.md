@@ -1,12 +1,26 @@
 # GitOps MTTR lab
 
-A reproducible two-node k3s cluster on libvirt VMs, with Gitea and Argo CD
+A reproducible three-node k3s cluster on libvirt VMs, with Gitea and Argo CD
 installed, for measuring mean time to recovery (MTTR) under GitOps.
 
 - k3s with embedded etcd and the Calico CNI
 - Gitea as the in-cluster Git server
 - Argo CD as the GitOps controller
 - A pluggable failure-scenario layer (see `scenarios/`)
+
+## Topology
+
+| VM            | Role                                   | Size            | Runs                         |
+|---------------|----------------------------------------|-----------------|------------------------------|
+| `k3s-server`  | Control plane + etcd, tainted `CriticalAddonsOnly=true:NoExecute` | 4 vCPU / 4 GiB | k3s addons, Traefik, Gitea, Argo CD |
+| `k3s-agent-1` | Worker                                 | 2 vCPU / 2 GiB  | Applications                 |
+| `k3s-agent-2` | Worker                                 | 2 vCPU / 2 GiB  | Applications                 |
+
+Platform components carry a toleration for `CriticalAddonsOnly` and a
+`nodeSelector` for `node-role.kubernetes.io/control-plane: "true"`, so they
+run only on the server. Traefik is pinned the same way with a `HelmChartConfig`
+written by the server's cloud-init. Anything without the toleration (the
+applications) is scheduled on the agents.
 
 ## Prerequisites
 
@@ -37,8 +51,9 @@ failure. Run `make help` to list all targets.
 
 ## Configuration
 
-- `config.env` (committed) holds VM sizes, names, and the pinned versions of
-  k3s, Calico and both Helm charts.
+- `config.env` (committed) holds the VM names (`SERVER_VM`, `AGENT_VMS`),
+  per-role sizes, the server taint, and the pinned versions of k3s, Calico and
+  both Helm charts.
 - `.env` (git-ignored) holds `K3S_TOKEN` and `GITEA_ADMIN_PASSWORD`. It is
   generated with random values on first run; see `.env.example`.
 

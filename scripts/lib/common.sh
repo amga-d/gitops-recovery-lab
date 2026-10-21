@@ -45,6 +45,10 @@ load_config() {
   for var in "${SECRET_VARS[@]}"; do
     [[ -n "${!var:-}" ]] || die "$var is empty after loading $ROOT/.env"
   done
+  read -ra AGENTS <<<"$AGENT_VMS"
+  ((${#AGENTS[@]} > 0)) || die "AGENT_VMS in config.env lists no agents"
+  # shellcheck disable=SC2034  # used by the scripts that source this file
+  ALL_VMS=("$SERVER_VM" "${AGENTS[@]}")
   SSH_KEY="${SSH_KEY/#\~/$HOME}"
   KUBECONFIG_FILE="${KUBECONFIG_FILE/#\~/$HOME}"
   mkdir -p "$STATE_DIR"

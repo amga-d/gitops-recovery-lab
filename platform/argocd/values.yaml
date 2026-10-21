@@ -1,3 +1,13 @@
+global:
+  # Every component inherits these: keep the GitOps controller on the tainted
+  # control-plane server, out of the application's failure domain.
+  nodeSelector:
+    kubernetes.io/os: linux
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
 configs:
   params:
     server.insecure: true            # serve plain HTTP; fine for a lab, avoids TLS hassle

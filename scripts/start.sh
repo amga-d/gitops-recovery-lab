@@ -33,13 +33,15 @@ wait_cloud_init() {
 }
 
 wait_cloud_init "$SERVER_VM" "$SERVER_SSH_USER"
-wait_cloud_init "$AGENT_VM" "$AGENT_SSH_USER"
+for agent in "${AGENTS[@]}"; do
+  wait_cloud_init "$agent" "$AGENT_SSH_USER"
+done
 
 "$ROOT/scripts/fetch-kubeconfig.sh"
 
-log "Waiting for both nodes to register and become Ready"
-wait_until 600 "2 nodes registered" bash -c \
-  "[[ \$(kubectl --kubeconfig '$KUBECONFIG_FILE' --context '$KUBE_CONTEXT' get nodes --no-headers 2>/dev/null | wc -l) -ge 2 ]]"
+log "Waiting for all ${#ALL_VMS[@]} nodes to register and become Ready"
+wait_until 600 "${#ALL_VMS[@]} nodes registered" bash -c \
+  "[[ \$(kubectl --kubeconfig '$KUBECONFIG_FILE' --context '$KUBE_CONTEXT' get nodes --no-headers 2>/dev/null | wc -l) -ge ${#ALL_VMS[@]} ]]"
 kc wait node --all --for=condition=Ready --timeout=600s
 
 ((SKIP_PLATFORM)) || "$ROOT/scripts/install-platform.sh"

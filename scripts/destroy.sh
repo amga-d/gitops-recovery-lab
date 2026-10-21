@@ -5,11 +5,11 @@ source "$(dirname "$0")/lib/common.sh"
 load_config
 
 if [[ "${FORCE:-0}" != 1 ]]; then
-  read -r -p "Destroy VMs $SERVER_VM and $AGENT_VM and their disks? [y/N] " ans
+  read -r -p "Destroy VMs ${ALL_VMS[*]} and their disks? [y/N] " ans
   [[ "$ans" =~ ^[Yy]$ ]] || die "aborted"
 fi
 
-for vm in "$AGENT_VM" "$SERVER_VM"; do
+for vm in "${AGENTS[@]}" "$SERVER_VM"; do
   vm_exists "$vm" || continue
   log "Removing $vm"
   [[ "$(vm_state "$vm")" == running ]] && "${VIRSH[@]}" destroy "$vm" >/dev/null
