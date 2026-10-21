@@ -1,0 +1,16 @@
+configs:
+  params:
+    server.insecure: true            # serve plain HTTP; fine for a lab, avoids TLS hassle
+  cm:
+    timeout.reconciliation: 180s     # polling interval; keep it fixed across runs
+    # timeout.reconciliation.jitter: 0s   # optional, for more consistent timing
+
+server:
+  service:
+    type: NodePort
+    nodePortHttp: 30080              # UI and API at http://<node-ip>:30080
+
+dex:
+  enabled: false                     # no SSO needed
+notifications:
+  enabled: false                     # turn this on later if you want alerts or timestamps

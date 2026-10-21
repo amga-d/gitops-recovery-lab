@@ -1,0 +1,52 @@
+gitea:
+  admin:
+    username: researcher
+    password: ""          # pass this at install time with --set-string, see below
+    email: researcher@local.test
+  config:
+    server:
+      DOMAIN: gitea-http.gitea.svc.cluster.local
+      ROOT_URL: http://gitea-http.gitea.svc.cluster.local:3000/
+      DISABLE_SSH: true            # use HTTP for Git; one less port and service
+    database:
+      DB_TYPE: sqlite3
+    session:
+      PROVIDER: memory
+    cache:
+      ADAPTER: memory
+    queue:
+      TYPE: level
+    service:
+      DISABLE_REGISTRATION: true
+    actions:
+      ENABLED: false
+    webhook:
+      ALLOWED_HOST_LIST: "*"       # or "private" to allow in-cluster IPs only
+    repository:
+      DEFAULT_BRANCH: main
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClass: local-path
+
+postgresql:
+  enabled: false
+postgresql-ha:
+  enabled: false
+valkey-cluster:
+  enabled: false
+valkey:
+  enabled: false
+
+service:
+  http:
+    type: NodePort
+    nodePort: 30300                # reach it from your host at http://<node-ip>:30300
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi

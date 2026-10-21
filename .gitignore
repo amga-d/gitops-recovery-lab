@@ -1,3 +1,7 @@
-noble-base.img
+# Generated state: base image, VM disks, rendered cloud-init, kubeconfig backups
+.state/
 *.qcow2
-experiment.md
+*.img
+
+# Local secrets
+.env
