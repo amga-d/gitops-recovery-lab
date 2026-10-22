@@ -1,0 +1,91 @@
+# Prometheus + Grafana + node-exporter + kube-state-metrics.
+# Everything except node-exporter is pinned to the tainted control-plane server,
+# so the measurement plane sits outside the application's failure domain.
+
+alertmanager:
+  enabled: false                   # recovery is measured, not alerted on
+
+prometheus:
+  service:
+    type: NodePort                 # nodePort set at install time from config.env
+  prometheusSpec:
+    scrapeInterval: 15s            # keep fixed across runs: it sets timestamp resolution
+    evaluationInterval: 15s
+    retention: 24h
+    retentionSize: 4GB
+    # Pick up ServiceMonitors/PodMonitors/rules from every release, not only this one.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: false
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 5Gi
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: "true"
+    tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+
+prometheusOperator:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+  admissionWebhooks:
+    deployment:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: "true"
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+    patch:
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: "true"
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+
+grafana:
+  adminUser: admin                 # password passed at install time with --set-string
+  service:
+    type: NodePort                 # nodePort set at install time from config.env
+  persistence:
+    enabled: false                 # dashboards come from code, not the UI
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+kube-state-metrics:
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+prometheus-node-exporter:
+  tolerations:
+    - operator: Exists             # every node, including the tainted server
+
+# k3s runs these inside its own process; there is nothing separate to scrape.
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeEtcd:
+  enabled: false

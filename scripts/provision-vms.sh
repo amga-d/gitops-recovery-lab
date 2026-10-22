@@ -27,9 +27,9 @@ ensure_base_image() {
   mv "$BASE_IMAGE.part" "$BASE_IMAGE"
 }
 
-# ensure_vm <name> <role: server|agent> <memory-mb> <vcpus>
+# ensure_vm <name> <role: server|agent> <memory-mb> <vcpus> <disk-size>
 ensure_vm() {
-  local vm=$1 role=$2 memory=$3 vcpus=$4
+  local vm=$1 role=$2 memory=$3 vcpus=$4 disk_size=$5
   if vm_exists "$vm"; then
     if [[ "$(vm_state "$vm")" == running ]]; then
       log "$vm already running"
@@ -51,7 +51,7 @@ ensure_vm() {
   VM_NAME=$vm envsubst "$TEMPLATE_VARS" <"$tmpl/meta-data.yaml.tmpl" >"$out/meta-data.yaml"
 
   # Absolute backing path so the overlay works from any directory.
-  sudo qemu-img create -q -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$disk" "$VM_DISK_SIZE"
+  sudo qemu-img create -q -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$disk" "$disk_size"
 
   sudo virt-install --connect qemu:///system \
     --name "$vm" \
@@ -63,7 +63,7 @@ ensure_vm() {
     --import --graphics none --noautoconsole
 }
 
-ensure_vm "$SERVER_VM" server "$SERVER_MEMORY_MB" "$SERVER_VCPUS"
+ensure_vm "$SERVER_VM" server "$SERVER_MEMORY_MB" "$SERVER_VCPUS" "$SERVER_DISK_SIZE"
 
 log "Waiting for $SERVER_VM to get an IP"
 SERVER_IP="$(wait_vm_ip "$SERVER_VM")"
@@ -72,5 +72,5 @@ log "$SERVER_VM IP: $SERVER_IP"
 
 # The agents' cloud-init needs the server IP, so they are created after it.
 for agent in "${AGENTS[@]}"; do
-  ensure_vm "$agent" agent "$AGENT_MEMORY_MB" "$AGENT_VCPUS"
+  ensure_vm "$agent" agent "$AGENT_MEMORY_MB" "$AGENT_VCPUS" "$AGENT_DISK_SIZE"
 done

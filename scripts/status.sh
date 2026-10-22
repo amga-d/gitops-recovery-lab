@@ -17,8 +17,9 @@ kc get nodes >/dev/null 2>&1 || { warn "context '$KUBE_CONTEXT' unreachable"; ex
 log "Nodes"
 kc get nodes -o wide
 log "Platform pods"
-kc get pods -n gitea -o wide 2>/dev/null || true
-kc get pods -n argocd -o wide 2>/dev/null || true
+for ns in gitea argocd argo-rollouts monitoring chaos-mesh; do
+  kc get pods -n "$ns" -o wide 2>/dev/null || true
+done
 
 NODE_IP="$(vm_ip "$SERVER_VM")"
 argocd_pw="$(kc -n argocd get secret argocd-initial-admin-secret \
@@ -28,5 +29,7 @@ log "Access"
 cat <<EOF
   Gitea   http://${NODE_IP}:${GITEA_NODEPORT}   user: ${GITEA_ADMIN_USER}  password: see GITEA_ADMIN_PASSWORD in .env
   Argo CD http://${NODE_IP}:${ARGOCD_NODEPORT}   user: admin       password: ${argocd_pw:-<not available>}
+  Grafana http://${NODE_IP}:${GRAFANA_NODEPORT}   user: admin       password: see GRAFANA_ADMIN_PASSWORD in .env
+  Prometheus http://${NODE_IP}:${PROMETHEUS_NODEPORT}
   kubectl --context ${KUBE_CONTEXT} get pods -A
 EOF

@@ -17,7 +17,7 @@ require_cmd() {
   ((${#missing[@]} == 0)) || die "missing required commands: ${missing[*]}"
 }
 
-SECRET_VARS=(K3S_TOKEN GITEA_ADMIN_PASSWORD)
+SECRET_VARS=(K3S_TOKEN GITEA_ADMIN_PASSWORD GRAFANA_ADMIN_PASSWORD)
 
 # Load committed defaults, then local secrets. Any secret missing or empty in
 # .env is generated and appended, so secrets stay stable across re-runs without

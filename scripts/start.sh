@@ -52,5 +52,16 @@ kc -n kube-system rollout status ds/calico-node --timeout=15m
 kc -n kube-system rollout status deploy/coredns --timeout=10m
 kc -n kube-system rollout status deploy/local-path-provisioner --timeout=10m
 
+# These controllers tolerate the server taint but have no nodeSelector, so the
+# scheduler may put them on an agent, where an agent fault would also take out
+# cluster DNS or provisioning. Pin them to the server. The merge patch keeps
+# their existing selector, and re-applying it is a no-op.
+log "Pinning the cluster addons to $SERVER_VM"
+pin='{"spec":{"template":{"spec":{"nodeSelector":{"node-role.kubernetes.io/control-plane":"true"}}}}}'
+for deploy in coredns metrics-server local-path-provisioner calico-kube-controllers; do
+  kc -n kube-system patch deploy "$deploy" --type merge -p "$pin" >/dev/null
+  kc -n kube-system rollout status deploy/"$deploy" --timeout=10m
+done
+
 ((SKIP_PLATFORM)) || "$ROOT/scripts/install-platform.sh"
 "$ROOT/scripts/status.sh"
