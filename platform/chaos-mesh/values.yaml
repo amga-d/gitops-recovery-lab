@@ -1,0 +1,46 @@
+controllerManager:
+  replicaCount: 1                  # extra replicas would only stand by (leader election)
+  # Pin to the tainted control-plane server, out of the application's failure domain.
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+chaosDaemon:
+  runtime: containerd
+  socketPath: /run/k3s/containerd/containerd.sock   # k3s's embedded containerd
+  # Every node, including the server, so faults can also target the control path.
+  tolerations:
+    - operator: Exists
+
+dashboard:
+  create: false                    # experiments are applied as manifests
+dnsServer:
+  create: false
+
+# The chart only sets prometheus.io annotations, which the Prometheus operator
+# ignores, so scrape both components through ServiceMonitors instead.
+extraObjects:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      name: chaos-controller-manager
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: chaos-mesh
+          app.kubernetes.io/component: controller-manager
+      endpoints:
+        - port: http
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      name: chaos-daemon
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: chaos-mesh
+          app.kubernetes.io/component: chaos-daemon
+      endpoints:
+        - port: http

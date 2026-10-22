@@ -1,0 +1,15 @@
+controller:
+  replicas: 1                      # a second replica would only stand by (leader election)
+  # Pin to the tainted control-plane server, out of the application's failure domain.
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true                # rollout and analysis-run phases for Prometheus
+
+dashboard:
+  enabled: false                   # use the kubectl plugin instead

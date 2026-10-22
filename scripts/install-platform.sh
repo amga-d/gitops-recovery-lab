@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install (or upgrade in place) Gitea and Argo CD at pinned chart versions.
+# Install (or upgrade in place) the platform at pinned chart versions: Gitea,
+# kube-prometheus-stack, Argo CD, Argo Rollouts and Chaos Mesh.
 source "$(dirname "$0")/lib/common.sh"
 load_config
 require_cmd kubectl helm
@@ -30,7 +31,9 @@ tolerate_local_path_helper
 log "Adding Helm repos"
 helm repo add gitea-charts https://dl.gitea.io/charts/ --force-update >/dev/null
 helm repo add argo https://argoproj.github.io/argo-helm --force-update >/dev/null
-helm repo update gitea-charts argo >/dev/null
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update >/dev/null
+helm repo add chaos-mesh https://charts.chaos-mesh.org --force-update >/dev/null
+helm repo update gitea-charts argo prometheus-community chaos-mesh >/dev/null
 
 log "Installing Gitea chart $GITEA_CHART_VERSION"
 hlm upgrade --install gitea gitea-charts/gitea \
@@ -43,6 +46,20 @@ hlm upgrade --install gitea gitea-charts/gitea \
   --wait --timeout 10m
 kc -n gitea rollout status deploy/gitea --timeout=5m
 
+# Before the other charts: it installs the ServiceMonitor CRD they rely on.
+log "Installing kube-prometheus-stack chart $KUBE_PROMETHEUS_STACK_CHART_VERSION"
+hlm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+  -n monitoring --create-namespace \
+  --version "$KUBE_PROMETHEUS_STACK_CHART_VERSION" \
+  -f "$ROOT/platform/kube-prometheus-stack/values.yaml" \
+  --set prometheus.service.nodePort="$PROMETHEUS_NODEPORT" \
+  --set grafana.service.nodePort="$GRAFANA_NODEPORT" \
+  --set-string grafana.adminPassword="$GRAFANA_ADMIN_PASSWORD" \
+  --wait --timeout 15m
+# The operator creates the Prometheus StatefulSet after helm returns.
+wait_until 300 "Prometheus StatefulSet" kc -n monitoring get statefulset prometheus-kube-prometheus-stack-prometheus
+kc -n monitoring rollout status statefulset/prometheus-kube-prometheus-stack-prometheus --timeout=10m
+
 log "Installing Argo CD chart $ARGOCD_CHART_VERSION"
 hlm upgrade --install argocd argo/argo-cd \
   -n argocd --create-namespace \
@@ -51,5 +68,20 @@ hlm upgrade --install argocd argo/argo-cd \
   --set server.service.nodePortHttp="$ARGOCD_NODEPORT" \
   --wait --timeout 10m
 kc -n argocd rollout status deploy/argocd-server --timeout=5m
+
+log "Installing Argo Rollouts chart $ARGO_ROLLOUTS_CHART_VERSION"
+hlm upgrade --install argo-rollouts argo/argo-rollouts \
+  -n argo-rollouts --create-namespace \
+  --version "$ARGO_ROLLOUTS_CHART_VERSION" \
+  -f "$ROOT/platform/argo-rollouts/values.yaml" \
+  --wait --timeout 10m
+
+log "Installing Chaos Mesh chart $CHAOS_MESH_CHART_VERSION"
+hlm upgrade --install chaos-mesh chaos-mesh/chaos-mesh \
+  -n chaos-mesh --create-namespace \
+  --version "$CHAOS_MESH_CHART_VERSION" \
+  -f "$ROOT/platform/chaos-mesh/values.yaml" \
+  --wait --timeout 10m
+kc -n chaos-mesh rollout status daemonset/chaos-daemon --timeout=10m
 
 log "Platform installed"

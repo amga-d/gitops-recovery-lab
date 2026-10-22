@@ -19,6 +19,28 @@ server:
   service:
     type: NodePort
     nodePortHttp: 30080              # UI and API at http://<node-ip>:30080
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+# Metrics for Prometheus. The application controller's include argocd_app_info
+# (sync and health status per Application).
+controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+applicationSet:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 dex:
   enabled: false                     # no SSO needed
