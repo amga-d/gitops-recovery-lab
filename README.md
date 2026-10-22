@@ -50,7 +50,13 @@ kubectl --context k3s get pods -A
 ```
 
 Every step is idempotent, so run `make up` again after a reboot or a partial
-failure. Run `make help` to list all targets.
+failure; a Helm release left half-installed by an interrupted run is rolled
+back or reinstalled automatically. Run `make help` to list all targets.
+
+Run `make down` before shutting down or rebooting the host. If the host goes
+down while `make up` is still pulling images, the VMs can be left with
+half-written image layers (containers fail with `exec format error` or
+`input/output error`); rebuild with `make destroy FORCE=1 && make up`.
 
 | Target            | What it does                                                      |
 |-------------------|-------------------------------------------------------------------|

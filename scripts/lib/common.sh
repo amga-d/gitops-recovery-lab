@@ -64,6 +64,17 @@ wait_until() {
   done
 }
 
+# retry <attempts> <command...>: re-run a flaky network command, pausing longer each time.
+retry() {
+  local attempts=$1 n=1; shift
+  until "$@"; do
+    ((n < attempts)) || return 1
+    warn "attempt $n/$attempts failed: $*; retrying in $((n * 10))s"
+    sleep $((n * 10))
+    n=$((n + 1))
+  done
+}
+
 vm_exists() { "${VIRSH[@]}" dominfo "$1" >/dev/null 2>&1; }
 vm_state()  { "${VIRSH[@]}" domstate "$1" 2>/dev/null | head -n1; }
 
