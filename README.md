@@ -22,12 +22,17 @@ recovery (MTTR) under GitOps.
 
 Platform components carry a toleration for `CriticalAddonsOnly` and a
 `nodeSelector` for `node-role.kubernetes.io/control-plane: "true"`, so they
-run only on the server. Traefik is pinned the same way with a `HelmChartConfig`
-written by the server's cloud-init, and `make up` pins the k3s and Calico
-controllers (CoreDNS, metrics-server, local-path, calico-kube-controllers).
-DaemonSets that must run everywhere (calico-node, node-exporter, chaos-daemon)
-tolerate the taint. Anything without the toleration (the applications) is
-scheduled on the agents.
+run only on the server: Gitea, Argo CD, the Argo Rollouts controller,
+Prometheus, Grafana, the Prometheus operator, kube-state-metrics and the Chaos
+Mesh controller-manager. The toleration lets them onto the tainted server; the
+`nodeSelector` keeps them off the agents.
+
+Traefik is pinned the same way with a `HelmChartConfig` written by the
+server's cloud-init, and `make up` pins the k3s and Calico controllers
+(CoreDNS, metrics-server, local-path, calico-kube-controllers). DaemonSets that
+must run on every node (calico-node, node-exporter, chaos-daemon) tolerate the
+taint and have no `nodeSelector`. Anything without the toleration (the
+applications) is scheduled on the agents.
 
 ## Prerequisites
 
