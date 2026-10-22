@@ -6,6 +6,26 @@ require_cmd kubectl helm
 
 kc get nodes >/dev/null || die "cannot reach context '$KUBE_CONTEXT'; run 'make kubeconfig' first"
 
+# k3s's local-path provisioner creates and deletes each volume's directory with
+# a helper pod bound to the volume's node. Its template has no tolerations, so on
+# the tainted server, where the platform's volumes live, the helper is evicted
+# and the PVC never binds. k3s may reset the ConfigMap on restart, so re-check
+# on every run.
+tolerate_local_path_helper() {
+  local helper patch
+  helper="$(kc -n kube-system get configmap local-path-config -o jsonpath='{.data.helperPod\.yaml}')"
+  grep -q CriticalAddonsOnly <<<"$helper" && return
+  log "Letting the local-path helper pod tolerate the server taint"
+  helper="$(sed '/^spec:/a\  tolerations:\n  - key: CriticalAddonsOnly\n    operator: Exists' <<<"$helper")"
+  patch="$(printf 'data:\n  helperPod.yaml: |\n%s\n' "$(sed 's/^/    /' <<<"$helper")")"
+  kc -n kube-system patch configmap local-path-config --type merge -p "$patch" >/dev/null
+  # Restart so the provisioner reads the new template now, not after the
+  # kubelet's next ConfigMap sync.
+  kc -n kube-system rollout restart deploy/local-path-provisioner >/dev/null
+  kc -n kube-system rollout status deploy/local-path-provisioner --timeout=2m
+}
+tolerate_local_path_helper
+
 log "Adding Helm repos"
 helm repo add gitea-charts https://dl.gitea.io/charts/ --force-update >/dev/null
 helm repo add argo https://argoproj.github.io/argo-helm --force-update >/dev/null
