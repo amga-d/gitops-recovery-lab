@@ -28,60 +28,73 @@ tolerate_local_path_helper() {
 }
 tolerate_local_path_helper
 
-log "Adding Helm repos"
-helm repo add gitea-charts https://dl.gitea.io/charts/ --force-update >/dev/null
-helm repo add argo https://argoproj.github.io/argo-helm --force-update >/dev/null
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update >/dev/null
-helm repo add chaos-mesh https://charts.chaos-mesh.org --force-update >/dev/null
-helm repo update gitea-charts argo prometheus-community chaos-mesh >/dev/null
+# Network fetches here run over a possibly flaky uplink, so they are retried.
+add_repo() {
+  helm repo list 2>/dev/null | awk 'NR > 1 {print $1}' | grep -qx "$1" && return
+  retry 3 helm repo add "$1" "$2" >/dev/null
+}
 
-log "Installing Gitea chart $GITEA_CHART_VERSION"
-hlm upgrade --install gitea gitea-charts/gitea \
-  -n gitea --create-namespace \
-  --version "$GITEA_CHART_VERSION" \
-  -f "$ROOT/platform/gitea/values.yaml" \
+# An interrupted helm run (host reboot, Ctrl-C) leaves its release "pending-*",
+# and helm then refuses every later operation on it. Nothing else runs helm
+# against this lab, so a pending release is always a dead one: roll it back,
+# or uninstall it if it never finished its first install.
+recover_release() {
+  local release=$1 ns=$2 last
+  last="$(hlm -n "$ns" history "$release" --max 1 -o json 2>/dev/null)" || return 0
+  case "$last" in
+    *'"status":"pending-install"'*)
+      warn "$release: first install was interrupted; uninstalling it to start over"
+      hlm -n "$ns" uninstall "$release" --wait --timeout 10m ;;
+    *'"status":"pending-'*)
+      warn "$release: last operation was interrupted; rolling back to the previous revision"
+      hlm -n "$ns" rollback "$release" --wait --timeout 10m ;;
+  esac
+}
+
+# install_chart <release> <namespace> <repo/chart> <version> <values-file> [helm args...]
+install_chart() {
+  local release=$1 ns=$2 chart=$3 version=$4 values=$5
+  shift 5
+  log "Installing $chart $version"
+  recover_release "$release" "$ns"
+  hlm upgrade --install "$release" "$chart" -n "$ns" --create-namespace \
+    --version "$version" -f "$values" --wait --timeout 15m "$@"
+}
+
+log "Adding Helm repos"
+add_repo gitea-charts https://dl.gitea.io/charts/
+add_repo argo https://argoproj.github.io/argo-helm
+add_repo prometheus-community https://prometheus-community.github.io/helm-charts
+add_repo chaos-mesh https://charts.chaos-mesh.org
+retry 3 helm repo update gitea-charts argo prometheus-community chaos-mesh >/dev/null
+
+install_chart gitea gitea gitea-charts/gitea "$GITEA_CHART_VERSION" \
+  "$ROOT/platform/gitea/values.yaml" \
   --set-string gitea.admin.username="$GITEA_ADMIN_USER" \
   --set-string gitea.admin.password="$GITEA_ADMIN_PASSWORD" \
-  --set service.http.nodePort="$GITEA_NODEPORT" \
-  --wait --timeout 10m
+  --set service.http.nodePort="$GITEA_NODEPORT"
 kc -n gitea rollout status deploy/gitea --timeout=5m
 
 # Before the other charts: it installs the ServiceMonitor CRD they rely on.
-log "Installing kube-prometheus-stack chart $KUBE_PROMETHEUS_STACK_CHART_VERSION"
-hlm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
-  -n monitoring --create-namespace \
-  --version "$KUBE_PROMETHEUS_STACK_CHART_VERSION" \
-  -f "$ROOT/platform/kube-prometheus-stack/values.yaml" \
+install_chart kube-prometheus-stack monitoring prometheus-community/kube-prometheus-stack \
+  "$KUBE_PROMETHEUS_STACK_CHART_VERSION" "$ROOT/platform/kube-prometheus-stack/values.yaml" \
   --set prometheus.service.nodePort="$PROMETHEUS_NODEPORT" \
   --set grafana.service.nodePort="$GRAFANA_NODEPORT" \
-  --set-string grafana.adminPassword="$GRAFANA_ADMIN_PASSWORD" \
-  --wait --timeout 15m
+  --set-string grafana.adminPassword="$GRAFANA_ADMIN_PASSWORD"
 # The operator creates the Prometheus StatefulSet after helm returns.
 wait_until 300 "Prometheus StatefulSet" kc -n monitoring get statefulset prometheus-kube-prometheus-stack-prometheus
 kc -n monitoring rollout status statefulset/prometheus-kube-prometheus-stack-prometheus --timeout=10m
 
-log "Installing Argo CD chart $ARGOCD_CHART_VERSION"
-hlm upgrade --install argocd argo/argo-cd \
-  -n argocd --create-namespace \
-  --version "$ARGOCD_CHART_VERSION" \
-  -f "$ROOT/platform/argocd/values.yaml" \
-  --set server.service.nodePortHttp="$ARGOCD_NODEPORT" \
-  --wait --timeout 10m
+install_chart argocd argocd argo/argo-cd "$ARGOCD_CHART_VERSION" \
+  "$ROOT/platform/argocd/values.yaml" \
+  --set server.service.nodePortHttp="$ARGOCD_NODEPORT"
 kc -n argocd rollout status deploy/argocd-server --timeout=5m
 
-log "Installing Argo Rollouts chart $ARGO_ROLLOUTS_CHART_VERSION"
-hlm upgrade --install argo-rollouts argo/argo-rollouts \
-  -n argo-rollouts --create-namespace \
-  --version "$ARGO_ROLLOUTS_CHART_VERSION" \
-  -f "$ROOT/platform/argo-rollouts/values.yaml" \
-  --wait --timeout 10m
+install_chart argo-rollouts argo-rollouts argo/argo-rollouts "$ARGO_ROLLOUTS_CHART_VERSION" \
+  "$ROOT/platform/argo-rollouts/values.yaml"
 
-log "Installing Chaos Mesh chart $CHAOS_MESH_CHART_VERSION"
-hlm upgrade --install chaos-mesh chaos-mesh/chaos-mesh \
-  -n chaos-mesh --create-namespace \
-  --version "$CHAOS_MESH_CHART_VERSION" \
-  -f "$ROOT/platform/chaos-mesh/values.yaml" \
-  --wait --timeout 10m
+install_chart chaos-mesh chaos-mesh chaos-mesh/chaos-mesh "$CHAOS_MESH_CHART_VERSION" \
+  "$ROOT/platform/chaos-mesh/values.yaml"
 kc -n chaos-mesh rollout status daemonset/chaos-daemon --timeout=10m
 
 log "Platform installed"
