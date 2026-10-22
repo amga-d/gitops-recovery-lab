@@ -44,5 +44,13 @@ wait_until 600 "${#ALL_VMS[@]} nodes registered" bash -c \
   "[[ \$(kubectl --kubeconfig '$KUBECONFIG_FILE' --context '$KUBE_CONTEXT' get nodes --no-headers 2>/dev/null | wc -l) -ge ${#ALL_VMS[@]} ]]"
 kc wait node --all --for=condition=Ready --timeout=600s
 
+# A node turns Ready as soon as Calico's CNI config is written, before
+# calico-node runs, so no pod can get a network yet. On first boot every node
+# also pulls the images, which can take minutes on a slow link.
+log "Waiting for Calico and the core k3s addons to run"
+kc -n kube-system rollout status ds/calico-node --timeout=15m
+kc -n kube-system rollout status deploy/coredns --timeout=10m
+kc -n kube-system rollout status deploy/local-path-provisioner --timeout=10m
+
 ((SKIP_PLATFORM)) || "$ROOT/scripts/install-platform.sh"
 "$ROOT/scripts/status.sh"
