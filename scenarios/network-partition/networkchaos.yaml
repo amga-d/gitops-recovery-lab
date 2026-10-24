@@ -1,0 +1,22 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: partition-${TRIAL_ID}
+  namespace: ${NAMESPACE}
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces: [${NAMESPACE}]
+    labelSelectors:
+      rollouts-pod-template-hash: "${TARGET_HASH}"
+  # Both sides: the app reaches the dependency through its ClusterIP, which is
+  # translated outside the pod, so only the dependency's side sees pod IPs.
+  direction: both
+  target:
+    mode: all
+    selector:
+      namespaces: [mttr-backend]
+      labelSelectors:
+        app.kubernetes.io/name: mttr-backend
+  duration: 15m

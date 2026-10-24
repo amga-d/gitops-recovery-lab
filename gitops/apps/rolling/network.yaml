@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mttr-app
+spec:
+  selector:
+    app.kubernetes.io/name: mttr-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: rolling
+spec:
+  entryPoints: [web]
+  routes:
+    - match: Host(`rolling.mttr.lab`)
+      kind: Rule
+      services:
+        - name: mttr-app
+          port: 80
+---
+# Scrape every app pod; the release label lets the analysis and the runner
+# separate the release under test from the stable one.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: mttr-app
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mttr-app
+  podTargetLabels:
+    - rollouts-pod-template-hash
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics

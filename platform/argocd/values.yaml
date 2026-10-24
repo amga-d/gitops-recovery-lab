@@ -13,7 +13,9 @@ configs:
     server.insecure: true            # serve plain HTTP; fine for a lab, avoids TLS hassle
   cm:
     timeout.reconciliation: 180s     # polling interval; keep it fixed across runs
-    # timeout.reconciliation.jitter: 0s   # optional, for more consistent timing
+    # No random spread on top of the interval, so the poll fallback is the
+    # same for every trial (Argo CD otherwise adds up to 60s of jitter).
+    timeout.reconciliation.jitter: 0s
 
 server:
   service:

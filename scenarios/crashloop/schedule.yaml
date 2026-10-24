@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: Schedule
+metadata:
+  name: crashloop-${TRIAL_ID}
+  namespace: ${NAMESPACE}
+spec:
+  schedule: "@every 10s"
+  type: PodChaos
+  historyLimit: 3
+  concurrencyPolicy: Allow
+  podChaos:
+    action: container-kill
+    mode: all
+    containerNames: [app]
+    selector:
+      namespaces: [${NAMESPACE}]
+      labelSelectors:
+        rollouts-pod-template-hash: "${TARGET_HASH}"

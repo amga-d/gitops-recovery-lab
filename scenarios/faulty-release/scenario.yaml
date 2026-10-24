@@ -1,0 +1,22 @@
+name: faulty-release
+description: The release under test answers 30% of requests with HTTP 500.
+category: release
+surface: release
+expected_recovery: rollouts
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto, manual]
+trigger:
+  phase: during-rollout
+  at: applied            # the faulty release reaches the cluster
+target:
+  selector: release-under-test
+  node: any
+inject:
+  kind: git-commit
+  patch:
+    env:
+      ERROR_RATE: "0.3"
+confirm: {kind: none}
+cleanup: {kind: none}
+timeout: 600s

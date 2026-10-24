@@ -1,0 +1,25 @@
+name: control-stable-partition
+description: >
+  Control condition, no rollout: one stable pod is partitioned from the
+  dependency for 60 s. Recovery is the fault ending; no GitOps layer acts.
+category: network
+surface: workload
+expected_recovery: kubernetes
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto]
+trigger:
+  phase: baseline
+  at: stable
+target:
+  selector: stable
+  pick: one
+  node: any
+inject:
+  kind: chaos-mesh
+  manifest: networkchaos.yaml
+confirm:
+  kind: chaos-injected
+  within: 30s
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s
