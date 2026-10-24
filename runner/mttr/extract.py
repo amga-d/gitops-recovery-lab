@@ -51,15 +51,21 @@ class Replay:
             yield e["t"], pred(state)
 
 
-def converged_pred(v1, app, git_head):
+def converged_pred(v1, app, git_head, strict=False):
+    """Git, Argo CD and the Rollout back at the baseline, all baseline replicas
+    Ready. With strict, also no pod of any other release left: that waits for
+    the scale-down delay of the aborted release (configuration, not recovery),
+    so it is reported separately as clean-up."""
     def pred(state):
         a = state.get(("Application", app), {})
         r = state.get(("Rollout", "mttr-app"), {})
         pods = [s for (k, _), s in state.items() if k == "Pod" and not s["deleted"]]
-        return (a.get("sync") == "Synced" and a.get("health") == "Healthy" and a.get("revision") == git_head
-                and r.get("phase") == "Healthy" and not r.get("abort")
-                and r.get("currentPodHash") == v1 and r.get("stableRS") == v1
-                and len(pods) == REPLICAS and all(p["ready"] and p["hash"] == v1 for p in pods))
+        base = [p for p in pods if p["hash"] == v1]
+        ok = (a.get("sync") == "Synced" and a.get("health") == "Healthy" and a.get("revision") == git_head
+              and r.get("phase") == "Healthy" and not r.get("abort")
+              and r.get("currentPodHash") == v1 and r.get("stableRS") == v1
+              and len(base) >= REPLICAS and all(p["ready"] for p in base))
+        return ok and (not strict or len(pods) == REPLICAS)
     return pred
 
 
@@ -242,6 +248,10 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
             if t_abort <= e["t"] < until and e["s"]["opPhase"] == "Running"})
     t_conv = last_rise(Replay(events), converged_pred(v1, app, git_head), t_inject, t_end)
     row["t_state_converged"] = t_conv
+    t_clean = last_rise(Replay(events), converged_pred(v1, app, git_head, strict=True), t_inject, t_end)
+    row["t_cleanup_done"] = t_clean
+    row["cleanup_after_converged_s"] = t_clean - t_conv
+    row["mttr_full_strict_s"] = (np.nanmax([t_clean, t_svc]) - t_inject) if not (meta.get("censored") or math.isnan(t_clean)) else NAN
     t_full = np.nanmax([t_conv, t_svc]) if not math.isnan(t_conv) else NAN
     if meta.get("censored"):
         t_full = NAN

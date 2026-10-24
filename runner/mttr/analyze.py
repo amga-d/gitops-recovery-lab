@@ -215,6 +215,7 @@ def analyze(out: pathlib.Path) -> None:
                      "censored": int((g.censored.astype(str) == "True").sum()),
                      "MTTR_full mean": full.get("mean"), "median": full.get("median"), "SD": full.get("sd"),
                      "CV": full.get("cv"), "P95": full.get("p95"),
+                     "MTTR_full strict mean": g.mttr_full_strict_s.mean() if "mttr_full_strict_s" in g else np.nan,
                      "MTTR_service mean": svc.get("mean"), "svc SD": svc.get("sd"),
                      "trigger mean": lat.get("mean"), "trigger CV": lat.get("cv"),
                      "cause": "/".join(sorted(set(g.trigger_cause.astype(str)))),
