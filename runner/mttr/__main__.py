@@ -62,8 +62,15 @@ def main() -> None:
                 row = extract(d, cfg, prom) | {k: old[k] for k in ("rep", "attempt", "valid") if k in old}
                 (d / "row.json").write_text(json.dumps(row, indent=1, default=str))
                 rows.append(row)
-        pd.DataFrame(rows).to_csv(out / "all-trials.csv", index=False)
-        print(f"re-extracted {len(rows)} trials")
+        df = pd.DataFrame(rows)
+        df.to_csv(out / "all-trials.csv", index=False)
+        cond_dir = out / "conditions"
+        cond_dir.mkdir(exist_ok=True)
+        for f in cond_dir.glob("*.csv"):
+            f.unlink()
+        for (s, sc, sp), g in df[df["valid"].astype(str) == "True"].groupby(["strategy", "scenario", "sync_policy"]):
+            g.to_csv(cond_dir / f"{s}__{sc}__{sp}.csv", index=False)
+        print(f"re-extracted {len(rows)} trials into all-trials.csv and {cond_dir}")
     elif a.cmd == "analyze":
         from .analyze import analyze
         analyze(out)
