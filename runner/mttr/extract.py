@@ -229,6 +229,17 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
         and e["s"]["opPhase"] != "Running", t_oos)
     row["t_synced"] = t_synced
     row["sync_duration_s"] = t_synced - t_op_start
+
+    # What Argo CD showed and did between the rollback and the corrective
+    # commit: the hand-off between the recovery layers.
+    if row["rollback_triggered"]:
+        until = t_revert if not math.isnan(t_revert) else t_end
+        before = [e for e in app_ev if e["t"] <= until - 0.5]
+        last = before[-1]["s"] if before else {}
+        row["argocd_state_before_revert"] = f"{last.get('sync')}/{last.get('health')}"
+        row["argocd_syncs_between_abort_and_revert"] = len({
+            e["s"]["opStartedAt"] for e in app_ev
+            if t_abort <= e["t"] < until and e["s"]["opPhase"] == "Running"})
     t_conv = last_rise(Replay(events), converged_pred(v1, app, git_head), t_inject, t_end)
     row["t_state_converged"] = t_conv
     t_full = np.nanmax([t_conv, t_svc]) if not math.isnan(t_conv) else NAN
@@ -237,7 +248,7 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     row["t_full"] = t_full
     row["mttr_full_s"] = t_full - t_inject
 
-    # Sequential decomposition (§2.1.6): detection, rollback, reconciliation.
+    # Sequential decomposition: detection, rollback, reconciliation.
     row["comp_detection_s"] = row["rollback_trigger_latency_s"]
     row["comp_rollback_s"] = row["rollback_execution_s"]
     row["comp_operator_wait_s"] = (t_revert - row["t_operator_sees_failure"]) if not math.isnan(t_revert) else NAN
