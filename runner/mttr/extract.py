@@ -132,8 +132,11 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     t_abort = _first(rollout_ev, lambda e: e["s"]["abort"], t_inject)
     ar = [e for e in events if e["kind"] == "AnalysisRun"]
     t_ar_failed = _first(ar, lambda e: e["s"]["phase"] in ("Failed", "Error") and e["s"]["hash"] == v2, t_inject)
-    t_deadline = _first(rollout_ev, lambda e: any(c["reason"] == "ProgressDeadlineExceeded" for c in e["s"]["conditions"]),
-                        t_inject)
+    # With progressDeadlineAbort the deadline shows up as an abort whose message
+    # says the ReplicaSet "has timed out progressing".
+    t_deadline = _first(rollout_ev, lambda e: any(c["reason"] in ("ProgressDeadlineExceeded", "TimedOutReason")
+                                                  for c in e["s"]["conditions"])
+                        or "timed out progressing" in (e["s"]["message"] or ""), t_inject)
     row["t_abort"] = t_abort
     row["rollback_triggered"] = not math.isnan(t_abort)
     if not row["rollback_triggered"]:
@@ -172,19 +175,39 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
         if row["rollback_triggered"] and v2 else NAN
 
     # --- service level (MTTR_service) -----------------------------------------
-    bins = sli_bins(req, cfg)
+    # A failure is attributed to the fault if the release or pod under fault
+    # answered it, or if no pod answered at all (router error, timeout). A
+    # failure answered by an untouched pod is background noise from the lab
+    # (e.g. a host stall): reported, but it does not define recovery.
+    targets = {h for h in (v2,) if h}
+    failed = ~req.status.between(200, 299)
+    attributable = req.hash.isin(targets) | (req.pod == "") | (req.pod == meta.get("target_pod"))
+    req["fault_failed"] = failed & attributable
+    req["background_failed"] = failed & ~attributable
     slo, w = cfg.num("SLI_SUCCESS"), cfg.num("SLI_BIN_S")
-    after = bins[(bins.index * w >= t_inject - w) & (bins.index * w <= t_end - cfg.num("REQUEST_TIMEOUT_S"))]
-    bad = after[after.ratio < slo]
-    row["service_impact"] = len(bad) > 0
-    t_svc = (bad.index.max() + 1) * w if len(bad) else t_inject
-    t_svc = max(t_svc, t_inject)
+    lo, hi = t_inject - w, t_end - cfg.num("REQUEST_TIMEOUT_S")
+
+    def restored(fail_col):
+        m = req[(req.stream == "main") & (req.t >= lo) & (req.t <= hi)].copy()
+        m["bin"] = (m.t // w).astype(int)
+        g = m.groupby("bin").agg(bad=(fail_col, "sum"), total=(fail_col, "size"))
+        bad = g[(g.total - g.bad) / g.total < slo]
+        t = max((bad.index.max() + 1) * w, t_inject) if len(bad) else t_inject
+        return t, len(bad)
+
+    req["all_failed"] = failed
+    t_svc, n_bad = restored("fault_failed")
+    t_svc_all, _ = restored("all_failed")
+    row["service_impact"] = n_bad > 0
     row["t_service_restored"] = t_svc
     row["mttr_service_s"] = t_svc - t_inject
-    row["bad_bins"] = int(len(bad))
-    win = main[(main.t >= t_inject) & (main.t <= t_svc)]
-    row["failed_requests"] = int((~win.status.between(200, 299)).sum())
-    row["requests_in_outage"] = int(len(win))
+    row["mttr_service_all_failures_s"] = t_svc_all - t_inject
+    row["bad_bins"] = int(n_bad)
+    main = req[req.stream == "main"]
+    after = main[main.t >= t_inject]
+    row["failed_requests"] = int(after.fault_failed.sum())
+    row["background_failed_requests"] = int(after.background_failed.sum())
+    row["requests_in_outage"] = int(((main.t >= t_inject) & (main.t <= t_svc)).sum())
     row["p95_latency_ms_baseline"] = float(main[main.t < t_inject].latency_ms.quantile(0.95)) if len(main) else NAN
 
     # --- GitOps reconciliation ---------------------------------------------

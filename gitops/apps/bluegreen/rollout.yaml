@@ -39,6 +39,11 @@ spec:
               value: v1
             - name: BACKEND_URL
               value: http://mttr-backend.mttr-backend.svc.cluster.local/
+            # Long enough that a brief host stall is not an error, short
+            # enough that an unreachable dependency fails well inside the
+            # load generator's 2 s timeout.
+            - name: BACKEND_TIMEOUT_MS
+              value: "1000"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
