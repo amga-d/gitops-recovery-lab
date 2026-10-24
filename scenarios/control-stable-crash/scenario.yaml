@@ -1,0 +1,26 @@
+name: control-stable-crash
+description: >
+  Control condition, no rollout: one stable pod is kept crashing for 60 s.
+  Only Kubernetes can recover it; Argo Rollouts and Argo CD are not engaged.
+category: pod
+surface: workload
+expected_recovery: kubernetes
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto]
+trigger:
+  phase: baseline
+  at: stable
+target:
+  selector: stable
+  pick: one
+  node: any
+inject:
+  kind: chaos-mesh
+  manifest: schedule.yaml
+  stop_after: 60s
+confirm:
+  kind: pod-restarts
+  within: 45s
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s

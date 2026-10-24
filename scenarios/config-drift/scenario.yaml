@@ -1,0 +1,27 @@
+name: config-drift
+description: >
+  An out-of-band edit of the live Rollout (bypassing Git) sets ERROR_RATE=0.3
+  in the pod template, as an unreviewed hotfix gone wrong would.
+category: drift
+surface: desired-state
+expected_recovery: argocd
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto, manual]
+trigger:
+  phase: baseline
+  at: stable
+target:
+  selector: stable
+  node: any
+inject:
+  kind: kubectl-patch
+  resource: rollout
+  patch_type: json
+  patch:
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value: {name: ERROR_RATE, value: "0.3"}
+confirm: {kind: none}
+cleanup: {kind: none}
+timeout: 600s

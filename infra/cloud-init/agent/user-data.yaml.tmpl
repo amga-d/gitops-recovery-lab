@@ -12,7 +12,14 @@ packages:
   - qemu-guest-agent
   - curl
   - git
+  - chrony
 
+# Downloads go over the host's uplink, which drops now and then: retry.
 runcmd:
   - systemctl enable --now qemu-guest-agent
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=${K3S_VERSION} K3S_URL=https://${SERVER_IP}:6443 K3S_TOKEN=${K3S_TOKEN} sh -
+  - |
+    for i in 1 2 3 4 5; do
+      curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=${K3S_VERSION} K3S_URL=https://${SERVER_IP}:6443 K3S_TOKEN=${K3S_TOKEN} sh - && break
+      echo "k3s install attempt $i failed; retrying in 20s"; sleep 20
+    done
+  - test -x /usr/local/bin/k3s || exit 1

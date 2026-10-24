@@ -1,0 +1,19 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: stable-partition-${TRIAL_ID}
+  namespace: ${NAMESPACE}
+spec:
+  action: partition
+  mode: all
+  selector:
+    pods:
+      ${NAMESPACE}: ["${TARGET_POD}"]
+  direction: both
+  target:
+    mode: all
+    selector:
+      namespaces: [mttr-backend]
+      labelSelectors:
+        app.kubernetes.io/name: mttr-backend
+  duration: 60s

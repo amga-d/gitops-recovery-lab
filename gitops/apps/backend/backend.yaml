@@ -1,0 +1,59 @@
+# The dependency every app release calls on each request. It is not part of
+# any rollout, so a fault on the path to it hits only the release it targets.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mttr-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mttr-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mttr-backend
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: mttr-backend
+      containers:
+        - name: backend
+          image: mttr.local/mttr-app:1.0.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MODE
+              value: backend
+            - name: RELEASE
+              value: backend
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          resources:
+            requests:
+              cpu: 20m
+              memory: 16Mi
+            limits:
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mttr-backend
+spec:
+  selector:
+    app.kubernetes.io/name: mttr-backend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

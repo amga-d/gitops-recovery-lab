@@ -51,9 +51,9 @@ ensure_vm() {
   VM_NAME=$vm envsubst "$TEMPLATE_VARS" <"$tmpl/meta-data.yaml.tmpl" >"$out/meta-data.yaml"
 
   # Absolute backing path so the overlay works from any directory.
-  sudo qemu-img create -q -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$disk" "$disk_size"
+  qemu-img create -q -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$disk" "$disk_size"
 
-  sudo virt-install --connect qemu:///system \
+  virt-install --connect qemu:///system \
     --name "$vm" \
     --memory "$memory" --vcpus "$vcpus" \
     --disk "path=$disk,format=qcow2" \

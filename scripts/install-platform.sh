@@ -51,14 +51,28 @@ recover_release() {
   esac
 }
 
+# fetch_chart <repo/chart> <version>: download the pinned chart once, with
+# retries, and print the local archive. Installs then never depend on the
+# uplink, and the exact chart that was installed stays on disk.
+fetch_chart() {
+  local chart=$1 version=$2 dir="$STATE_DIR/charts"
+  local tgz="$dir/${chart#*/}-$version.tgz"
+  if [[ ! -s "$tgz" ]]; then
+    mkdir -p "$dir"
+    retry 5 helm pull "$chart" --version "$version" -d "$dir" >&2 || die "cannot download $chart $version"
+  fi
+  echo "$tgz"
+}
+
 # install_chart <release> <namespace> <repo/chart> <version> <values-file> [helm args...]
 install_chart() {
-  local release=$1 ns=$2 chart=$3 version=$4 values=$5
+  local release=$1 ns=$2 chart=$3 version=$4 values=$5 tgz
   shift 5
   log "Installing $chart $version"
+  tgz="$(fetch_chart "$chart" "$version")"
   recover_release "$release" "$ns"
-  hlm upgrade --install "$release" "$chart" -n "$ns" --create-namespace \
-    --version "$version" -f "$values" --wait --timeout 15m "$@"
+  hlm upgrade --install "$release" "$tgz" -n "$ns" --create-namespace \
+    -f "$values" --wait --timeout 15m "$@"
 }
 
 log "Adding Helm repos"
@@ -87,7 +101,9 @@ kc -n monitoring rollout status statefulset/prometheus-kube-prometheus-stack-pro
 
 install_chart argocd argocd argo/argo-cd "$ARGOCD_CHART_VERSION" \
   "$ROOT/platform/argocd/values.yaml" \
-  --set server.service.nodePortHttp="$ARGOCD_NODEPORT"
+  --set server.service.nodePortHttp="$ARGOCD_NODEPORT" \
+  --set-string configs.secret.githubSecret="$ARGOCD_WEBHOOK_SECRET" \
+  --set-string configs.secret.gogsSecret="$ARGOCD_WEBHOOK_SECRET"
 kc -n argocd rollout status deploy/argocd-server --timeout=5m
 
 install_chart argo-rollouts argo-rollouts argo/argo-rollouts "$ARGO_ROLLOUTS_CHART_VERSION" \

@@ -1,0 +1,24 @@
+name: network-partition
+description: >
+  The release under test is partitioned from its dependency (Chaos Mesh
+  NetworkChaos), so it answers 503 while the stable release keeps working.
+category: network
+surface: release
+expected_recovery: rollouts
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto, manual]
+trigger:
+  phase: during-rollout
+  at: release-live
+target:
+  selector: release-under-test
+  node: any
+inject:
+  kind: chaos-mesh
+  manifest: networkchaos.yaml
+confirm:
+  kind: chaos-injected
+  within: 30s
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s

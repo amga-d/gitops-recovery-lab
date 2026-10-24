@@ -13,7 +13,7 @@ for vm in "${AGENTS[@]}" "$SERVER_VM"; do
   vm_exists "$vm" || continue
   log "Removing $vm"
   [[ "$(vm_state "$vm")" == running ]] && "${VIRSH[@]}" destroy "$vm" >/dev/null
-  sudo virsh -c qemu:///system undefine "$vm" --remove-all-storage >/dev/null
+  "${VIRSH[@]}" undefine "$vm" --remove-all-storage >/dev/null
 done
 
 rm -rf "$STATE_DIR/cloud-init" "$STATE_DIR/disks"

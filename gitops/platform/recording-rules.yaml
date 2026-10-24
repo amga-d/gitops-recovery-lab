@@ -1,0 +1,27 @@
+# Recording rules for dashboards and the runner's Prometheus cross-check.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: mttr
+  namespace: monitoring
+spec:
+  groups:
+    - name: mttr.rules
+      interval: 15s
+      rules:
+        - record: mttr:app_requests:rate1m
+          expr: sum by (namespace, rollouts_pod_template_hash, code) (rate(app_http_requests_total[1m]))
+        - record: mttr:app_error_ratio:rate1m
+          expr: |
+            sum by (namespace, rollouts_pod_template_hash) (rate(app_http_requests_total{code=~"5.."}[1m]))
+            /
+            sum by (namespace, rollouts_pod_template_hash) (rate(app_http_requests_total[1m]))
+        - record: mttr:app_latency_p95:rate1m
+          expr: histogram_quantile(0.95, sum by (namespace, rollouts_pod_template_hash, le) (rate(app_http_request_duration_seconds_bucket[1m])))
+        - record: mttr:app_ready_pods
+          expr: |
+            sum by (namespace, label_rollouts_pod_template_hash) (
+              kube_pod_status_ready{condition="true", namespace=~"mttr-.*"}
+              * on (namespace, pod) group_left (label_rollouts_pod_template_hash)
+              kube_pod_labels{namespace=~"mttr-.*"}
+            )

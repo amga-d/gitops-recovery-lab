@@ -70,6 +70,10 @@ grafana:
       operator: Exists
 
 kube-state-metrics:
+  # Expose each pod's release label, so restarts can be attributed to the
+  # release under test (kube_pod_labels{label_rollouts_pod_template_hash=...}).
+  metricLabelsAllowlist:
+    - pods=[rollouts-pod-template-hash,app.kubernetes.io/name]
   nodeSelector:
     node-role.kubernetes.io/control-plane: "true"
   tolerations:

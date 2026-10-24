@@ -2,22 +2,48 @@ SHELL := /usr/bin/env bash
 S := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help up vms kubeconfig platform status down destroy lint
+.PHONY: help up vms kubeconfig platform app-image seed runner-env trial pilot extract analyze status down destroy lint
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-11s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-up: ## Full idempotent bring-up: VMs, k3s, kubeconfig, Gitea, Argo CD
+up: ## Full idempotent bring-up: VMs, k3s, kubeconfig, platform
 	@$(S)/start.sh
 
 vms: ## Create or start the VMs only
 	@$(S)/provision-vms.sh
 
-kubeconfig: ## Fetch the server kubeconfig and merge it as context "k3s"
+kubeconfig: ## Fetch the server kubeconfig and merge it as the configured kube context
 	@$(S)/fetch-kubeconfig.sh
 
-platform: ## Install or upgrade Gitea and Argo CD
+platform: ## Install or upgrade the platform (Gitea, monitoring, Argo CD, Rollouts, Chaos Mesh)
 	@$(S)/install-platform.sh
+
+PY := .state/venv/bin/python
+MTTR := cd runner && ../$(PY) -m mttr
+
+app-image: ## Build the sample app and import it into every node
+	@$(S)/build-app.sh
+
+seed: ## Seed the GitOps repo, webhook, analysis templates and Argo CD apps
+	@$(S)/seed-gitops.sh
+
+runner-env: ## Create the Python environment for the runner and analysis
+	@command -v uv >/dev/null || { echo "uv is required"; exit 1; }
+	@[ -x $(PY) ] || uv venv -q -p python3 .state/venv
+	@VIRTUAL_ENV=.state/venv uv pip install -q -r runner/requirements.txt
+
+trial: ## One trial: make trial STRATEGY=canary SCENARIO=faulty-release SYNC=auto
+	@$(MTTR) trial --strategy $(STRATEGY) --scenario $(SCENARIO) --sync $(or $(SYNC),auto)
+
+pilot: ## Run or resume the randomised trial plan (REPS=3 SEED=...)
+	@$(MTTR) pilot --reps $(or $(REPS),3) $(if $(SEED),--seed $(SEED))
+
+extract: ## Re-extract every recorded trial into all-trials.csv
+	@$(MTTR) extract
+
+analyze: ## Statistics, figures and report.md from the recorded trials
+	@$(MTTR) analyze
 
 status: ## Show VMs, nodes, platform pods and access URLs
 	@$(S)/status.sh

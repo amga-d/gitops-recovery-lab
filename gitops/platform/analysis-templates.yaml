@@ -1,0 +1,80 @@
+# The release health check shared by every strategy: the same metrics,
+# thresholds and timing, so only the strategy differs between conditions.
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterAnalysisTemplate
+metadata:
+  name: release-health
+spec:
+  args:
+    - name: namespace
+    - name: hash
+  metrics:
+    # Share of the release's requests that failed, over the last minute.
+    # No traffic yet counts as 0 rather than as an error.
+    - name: error-rate
+      interval: 15s
+      failureLimit: 1
+      successCondition: result[0] <= 0.05
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+          query: |
+            (sum(rate(app_http_requests_total{namespace="{{args.namespace}}",rollouts_pod_template_hash="{{args.hash}}",code=~"5.."}[1m])) or vector(0))
+            /
+            (sum(rate(app_http_requests_total{namespace="{{args.namespace}}",rollouts_pod_template_hash="{{args.hash}}"}[1m])) > 0 or vector(1))
+    # Container restarts in the release's pods. Independent of traffic, so a
+    # crashing release is caught even where it receives no requests.
+    - name: restarts
+      interval: 15s
+      failureLimit: 0
+      successCondition: result[0] < 1
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+          query: |
+            sum(
+              kube_pod_container_status_restarts_total{namespace="{{args.namespace}}"}
+              * on (namespace, pod) group_left ()
+              max by (namespace, pod) (kube_pod_labels{namespace="{{args.namespace}}",label_rollouts_pod_template_hash="{{args.hash}}"})
+            ) or vector(0)
+---
+# The same check with a fixed length, for blue-green's pre-promotion gate.
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterAnalysisTemplate
+metadata:
+  name: release-health-gate
+spec:
+  args:
+    - name: namespace
+    - name: hash
+  metrics:
+    # Share of the release's requests that failed, over the last minute.
+    # No traffic yet counts as 0 rather than as an error.
+    - name: error-rate
+      interval: 15s
+      count: 12
+      failureLimit: 1
+      successCondition: result[0] <= 0.05
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+          query: |
+            (sum(rate(app_http_requests_total{namespace="{{args.namespace}}",rollouts_pod_template_hash="{{args.hash}}",code=~"5.."}[1m])) or vector(0))
+            /
+            (sum(rate(app_http_requests_total{namespace="{{args.namespace}}",rollouts_pod_template_hash="{{args.hash}}"}[1m])) > 0 or vector(1))
+    # Container restarts in the release's pods. Independent of traffic, so a
+    # crashing release is caught even where it receives no requests.
+    - name: restarts
+      interval: 15s
+      count: 12
+      failureLimit: 0
+      successCondition: result[0] < 1
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+          query: |
+            sum(
+              kube_pod_container_status_restarts_total{namespace="{{args.namespace}}"}
+              * on (namespace, pod) group_left ()
+              max by (namespace, pod) (kube_pod_labels{namespace="{{args.namespace}}",label_rollouts_pod_template_hash="{{args.hash}}"})
+            ) or vector(0)
