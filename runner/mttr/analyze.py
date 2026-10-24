@@ -229,6 +229,32 @@ def analyze(out: pathlib.Path) -> None:
     n_star = int(np.nanmax(desc["N required"])) if desc["N required"].notna().any() else None
     rep += [f"**N for the main runs (largest per-condition requirement): {n_star}**", ""]
 
+    # --- success criteria per condition --------------------------------------
+    # Trigger-latency consistency and rollback success only mean something
+    # where the analysis, not a configured deadline, detects the fault.
+    crit = []
+    for key, g in df.groupby(COND):
+        causes = set(g.trigger_cause.astype(str))
+        trig = g.rollback_triggered.astype(str) == "True"
+        if not trig.any():
+            continue
+        lat = describe(g.rollback_trigger_latency_s)
+        succ = (g.rollback_success.astype(str) == "True").sum() / trig.sum()
+        crit.append({"scenario": key[0], "strategy": key[1], "sync": key[2], "detected by": "/".join(sorted(causes)),
+                     "trigger CV": lat.get("cv"), "CV < 0.30": bool(lat.get("cv", np.nan) < 0.30),
+                     "success rate": succ, "success ≥ 0.80": bool(succ >= 0.80)})
+    if crit:
+        rep += ["## Latency consistency and rollback success per condition", "",
+                "Only conditions where a rollback was triggered. Deadline-detected conditions pass the CV test by "
+                "construction, so read them separately.", "", md_table(pd.DataFrame(crit), 2), ""]
+
+    # --- hand-off between the layers -------------------------------------------
+    if "argocd_state_before_revert" in df:
+        h = df[df.rollback_triggered.astype(str) == "True"]
+        ho = h.groupby(["argocd_state_before_revert"]).agg(
+            trials=("trial_id", "size"), syncs_before_revert=("argocd_syncs_between_abort_and_revert", "sum")).reset_index()
+        rep += ["## Argo CD between the rollback and the corrective commit", "", md_table(ho, 0), ""]
+
     # --- MTTR components -----------------------------------------------------
     comps = ["comp_detection_s", "comp_rollback_s", "comp_operator_wait_s", "comp_reconcile_s", "mttr_service_s",
              "outofsync_lag_s", "sync_duration_s", "inject_lag_s"]
