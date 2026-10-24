@@ -23,10 +23,7 @@ status: ## Show VMs, nodes, platform pods and access URLs
 	@$(S)/status.sh
 
 down: ## Gracefully shut down the VMs (keeps everything)
-	@source $(S)/lib/common.sh && load_config && \
-	for vm in "$${AGENTS[@]}" $$SERVER_VM; do \
-	  [[ "$$(vm_state $$vm)" == running ]] && "$${VIRSH[@]}" shutdown $$vm || true; \
-	done
+	@$(S)/down.sh
 
 destroy: ## Delete the VMs, disks and kube context (FORCE=1 skips the prompt)
 	@$(S)/destroy.sh
