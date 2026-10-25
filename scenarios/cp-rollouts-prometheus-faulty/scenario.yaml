@@ -2,6 +2,8 @@ name: cp-rollouts-prometheus-faulty
 description: >
   A faulty release (30% HTTP 500) is analysed while the Argo Rollouts
   controller cannot reach Prometheus, so its metric cannot show the fault.
+  Short variant: at 120 s the analysis only pauses; the -long variant
+  lasts 300 s.
 category: network
 surface: control-path
 expected_recovery: rollouts    # if at all, through the analysis error path

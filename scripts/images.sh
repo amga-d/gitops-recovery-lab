@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Keep every container image the lab needs on the host, so a rebuilt cluster
 # never has to pull from a registry over the host's network link.
-#   save   export all images from the server's and the first agent's containerd
-#          into .state/images/{server,agent}.tar (run once on a working cluster)
+#   save   pull, on the host, every image the pods on the server and the first
+#          agent run, into .state/images/{server,agent}.tar (run once on a working cluster)
 #   load   import those archives into every node (start.sh runs this when they exist)
 source "$(dirname "$0")/lib/common.sh"
 load_config
-require_cmd ssh
+require_cmd ssh docker jq
 
 IMAGES_DIR="$STATE_DIR/images"
 mkdir -p "$IMAGES_DIR"
@@ -14,17 +14,31 @@ mkdir -p "$IMAGES_DIR"
 # node_user <vm>
 node_user() { [[ "$1" == "$SERVER_VM" ]] && echo "$SERVER_SSH_USER" || echo "$AGENT_SSH_USER"; }
 
-# save_node <vm> <archive>
-save_node() {
-  local vm=$1 archive=$2 ip refs
+# node_images <vm>: the images the pods on <vm> run, plus k3s's pause image
+node_images() {
+  local vm=$1 ip
+  kc get pods -A --field-selector "spec.nodeName=$vm" \
+    -o jsonpath='{range .items[*]}{range .spec.initContainers[*]}{.image}{"\n"}{end}{range .spec.containers[*]}{.image}{"\n"}{end}{end}'
   ip="$(vm_ip "$vm")"
-  [[ -n "$ip" ]] || die "$vm has no IP; is it running?"
-  # Named references only; the sha256: aliases point at the same content.
-  refs="$(SSH_USER=$(node_user "$vm") vm_ssh "$ip" sudo k3s ctr -n k8s.io images ls -q | grep -v '^sha256:' | tr '\n' ' ')"
-  [[ -n "$refs" ]] || die "no images found on $vm"
-  log "Exporting $(wc -w <<<"$refs") images from $vm to $archive"
-  # shellcheck disable=SC2086  # refs is a word list on purpose
-  SSH_USER=$(node_user "$vm") vm_ssh "$ip" sudo k3s ctr -n k8s.io images export --platform linux/amd64 - $refs >"$archive.part"
+  SSH_USER=$(node_user "$vm") vm_ssh "$ip" sudo k3s crictl images -o json \
+    | jq -r '.images[].repoTags[]? | select(test("pause"))'
+}
+
+# save_node <vm> <archive>: k3s's containerd discards layer blobs once they are
+# unpacked, so its images cannot be exported; pull them on the host instead.
+save_node() {
+  local vm=$1 archive=$2 img refs=()
+  while read -r img; do
+    [[ -n "$img" ]] || continue
+    if ! docker image inspect "$img" >/dev/null 2>&1; then
+      log "Pulling $img"
+      retry 5 docker pull -q "$img" >/dev/null || die "could not pull $img"
+    fi
+    refs+=("$img")
+  done < <(node_images "$vm" | sort -u)
+  ((${#refs[@]})) || die "no images found for $vm"
+  log "Saving ${#refs[@]} images for $vm to $archive"
+  docker save -o "$archive.part" "${refs[@]}"
   mv "$archive.part" "$archive"
 }
 

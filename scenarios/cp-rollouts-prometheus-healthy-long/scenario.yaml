@@ -1,0 +1,29 @@
+name: cp-rollouts-prometheus-healthy-long
+description: >
+  A healthy release is analysed while the Argo Rollouts controller cannot
+  reach Prometheus. The analysis can only error; an abort here rolls back a
+  release that had nothing wrong with it.
+  Long variant: the 300 s partition outlasts the analysis's
+  consecutive-error limit (5 errors, one every ~40 s while queries time
+  out), so the error path can fire.
+category: network
+surface: control-path
+expected_recovery: none        # nothing is broken; any rollback is a false alarm
+release_is_healthy: true
+applies_to:
+  strategies: [canary]
+  sync_policies: [auto]
+trigger:
+  phase: during-rollout
+  at: release-live
+target:
+  selector: control-path
+inject:
+  kind: chaos-mesh             # the release itself carries no fault
+  manifest: networkchaos.yaml
+  stop_after: 300s
+confirm:
+  kind: chaos-injected
+  within: 30s
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s

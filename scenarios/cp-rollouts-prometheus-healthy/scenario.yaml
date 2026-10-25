@@ -3,6 +3,8 @@ description: >
   A healthy release is analysed while the Argo Rollouts controller cannot
   reach Prometheus. The analysis can only error; an abort here rolls back a
   release that had nothing wrong with it.
+  Short variant: at 120 s the analysis only pauses; the -long variant
+  lasts 300 s.
 category: network
 surface: control-path
 expected_recovery: none        # nothing is broken; any rollback is a false alarm
