@@ -109,6 +109,10 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     t_end = meta["t_end"]
     row = {k: meta.get(k) for k in ("trial_id", "strategy", "scenario", "sync_policy", "inject_kind",
                                     "v1_hash", "v2_hash", "censored", "baseline_success")}
+    row["block"] = meta.get("block")
+    row["revert_path"] = meta.get("revert_path", "webhook")
+    row["release_is_healthy"] = bool(meta.get("release_is_healthy"))
+    row["history_precondition"] = meta.get("history_precondition")
     row["order"] = meta.get("order")
     row["confirmed"] = meta.get("confirmed", True)
 
@@ -137,7 +141,10 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     # --- rollback trigger (DV2) ----------------------------------------------
     t_abort = _first(rollout_ev, lambda e: e["s"]["abort"], t_inject)
     ar = [e for e in events if e["kind"] == "AnalysisRun"]
-    t_ar_failed = _first(ar, lambda e: e["s"]["phase"] in ("Failed", "Error") and e["s"]["hash"] == v2, t_inject)
+    t_ar_failed = _first(ar, lambda e: e["s"]["phase"] == "Failed" and e["s"]["hash"] == v2, t_inject)
+    # An analysis that cannot query its metrics ends in Error after
+    # consecutiveErrorLimit measurement errors: a different detection path.
+    t_ar_error = _first(ar, lambda e: e["s"]["phase"] == "Error" and e["s"]["hash"] == v2, t_inject)
     # With progressDeadlineAbort the deadline shows up as an abort whose message
     # says the ReplicaSet "has timed out progressing".
     t_deadline = _first(rollout_ev, lambda e: any(c["reason"] in ("ProgressDeadlineExceeded", "TimedOutReason")
@@ -147,6 +154,12 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     row["rollback_triggered"] = not math.isnan(t_abort)
     if not row["rollback_triggered"]:
         row["trigger_cause"] = "none"
+    elif not math.isnan(t_ar_error) and t_ar_error <= t_abort + 1 and (
+            math.isnan(t_ar_failed) or t_ar_error <= t_ar_failed):
+        row["trigger_cause"] = "error-path"
+        row["failed_metric"] = "+".join(sorted({m["name"] for e in ar if e["s"]["phase"] == "Error"
+                                                and e["s"]["hash"] == v2 for m in e["s"]["metrics"]
+                                                if m["phase"] == "Error"}))
     elif not math.isnan(t_ar_failed) and t_ar_failed <= t_abort + 1:
         row["trigger_cause"] = "analysis"
         failed_metrics = [m["name"] for e in ar if e["s"]["phase"] in ("Failed", "Error") and e["s"]["hash"] == v2
@@ -158,6 +171,25 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
         row["trigger_cause"] = "other"
     row["rollback_trigger_latency_s"] = t_abort - t_inject
 
+    # --- inputs of the detection-latency model --------------------------------
+    # Measurement times of the release's analysis, and when its fault first
+    # became observable, so the predicted abort tick can be checked per trial.
+    rel_ar = [e for e in ar if e["s"]["hash"] == v2] if v2 else []
+    t_a = _first(rel_ar, lambda e: e["s"]["phase"] == "Running")
+    row["t_analysis_start"] = t_a
+    row["analysis_start_offset_s"] = t_a - t_inject
+    ticks: dict[str, list[float]] = {}
+    first_fail: dict[str, float] = {}
+    seen: dict[tuple[str, int], bool] = {}
+    for e in rel_ar:
+        for m in e["s"]["metrics"] or []:
+            if m["count"] and (m["name"], m["count"]) not in seen:
+                seen[(m["name"], m["count"])] = True
+                ticks.setdefault(m["name"], []).append(round(e["t"] - t_inject, 2))
+            if (m.get("failed") or 0) > 0 and m["name"] not in first_fail:
+                first_fail[m["name"]] = e["t"]
+    row["analysis_ticks"] = json.dumps(ticks) if ticks else ""
+    row["first_failing_measurement_s"] = min(first_fail.values()) - t_inject if first_fail else NAN
     # --- rollback execution ----------------------------------------------------
     pod_hash = {}
     for e in events:
@@ -212,6 +244,12 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     main = req[req.stream == "main"]
     after = main[main.t >= t_inject]
     row["failed_requests"] = int(after.fault_failed.sum())
+    rel_fail = after[after.fault_failed & after.hash.isin(targets)]
+    row["t_first_fault_response"] = float(rel_fail.t.min()) if len(rel_fail) else NAN
+    row["first_fault_response_s"] = row["t_first_fault_response"] - t_inject
+    t_restart = _first([e for e in events if e["kind"] == "Pod"],
+                       lambda e: e["s"]["hash"] == v2 and (e["s"].get("restarts") or 0) > 0, t_inject - 5) if v2 else NAN
+    row["first_release_restart_s"] = t_restart - t_inject
     row["background_failed_requests"] = int(after.background_failed.sum())
     row["requests_in_outage"] = int(((main.t >= t_inject) & (main.t <= t_svc)).sum())
     row["p95_latency_ms_baseline"] = float(main[main.t < t_inject].latency_ms.quantile(0.95)) if len(main) else NAN
@@ -246,9 +284,12 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
         row["argocd_syncs_between_abort_and_revert"] = len({
             e["s"]["opStartedAt"] for e in app_ev
             if t_abort <= e["t"] < until and e["s"]["opPhase"] == "Running"})
-    t_conv = last_rise(Replay(events), converged_pred(v1, app, git_head), t_inject, t_end)
+    # A healthy release that was promoted and never reverted is the intended
+    # end state of its trial; everything else converges back to the baseline.
+    want = v2 if meta.get("release_is_healthy") and not meta.get("git_revert") and v2 else v1
+    t_conv = last_rise(Replay(events), converged_pred(want, app, git_head), t_inject, t_end)
     row["t_state_converged"] = t_conv
-    t_clean = last_rise(Replay(events), converged_pred(v1, app, git_head, strict=True), t_inject, t_end)
+    t_clean = last_rise(Replay(events), converged_pred(want, app, git_head, strict=True), t_inject, t_end)
     row["t_cleanup_done"] = t_clean
     row["cleanup_after_converged_s"] = t_clean - t_conv
     row["mttr_full_strict_s"] = (np.nanmax([t_clean, t_svc]) - t_inject) if not (meta.get("censored") or math.isnan(t_clean)) else NAN
@@ -284,6 +325,8 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     else:
         row["recovered_by"] = "unknown"
 
+    row["coverage_class"] = coverage_class(row, meta)
+
     # --- covariates --------------------------------------------------------------
     cov = meta.get("covariates", {})
     skews = [abs(v["offset_ms"]) for v in cov.get("clock_skew", {}).values() if v.get("offset_ms") is not None]
@@ -304,6 +347,24 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     if prom is not None:
         row |= cross_check(prom, meta, row, t_end)
     return row
+
+
+def coverage_class(row: dict, meta: dict) -> str:
+    """One class per trial: how (or whether) the stack caught the fault."""
+    if row["rollback_triggered"]:
+        if meta.get("release_is_healthy"):
+            return "false-rollback"
+        return {"analysis": "analysis", "deadline": "deadline", "error-path": "error-path"}.get(
+            row["trigger_cause"], "other")
+    if meta.get("censored"):
+        return "stalled"
+    if meta.get("release_is_healthy"):
+        return "tolerated"  # the healthy release went through despite the fault
+    if row["recovered_by"] == "operator+argocd":
+        return "operator-only"
+    if row["recovered_by"] in ("argocd", "kubernetes"):
+        return "self-heal"
+    return "other"
 
 
 def _prom_first(series, after):
@@ -328,6 +389,14 @@ def cross_check(prom: obs.Prometheus, meta: dict, row: dict, t_end: float) -> di
         if row.get("v2_hash"):
             out["prom_t_release_errors"] = _prom_first(
                 q(f'mttr:app_error_ratio:rate1m{{namespace="{ns}",rollouts_pod_template_hash="{row["v2_hash"]}"}}'), t0 - 30)
+        if row.get("v2_hash"):
+            # When Prometheus actually sampled the release: the scrape phase the
+            # latency model needs. timestamp() of the newest sample at each step.
+            for key, expr in (("app", f'app_http_requests_total{{namespace="{ns}",pod=~"mttr-app-{row["v2_hash"]}-.*"}}'),
+                              ("ksm", f'kube_pod_container_status_restarts_total{{namespace="{ns}",pod=~"mttr-app-{row["v2_hash"]}-.*"}}')):
+                series = prom.range(f"timestamp({expr})", t0 - 30, t_end, 1)
+                stamps = sorted({round(float(v), 3) for s in series for _, v in s["values"]})
+                out[f"scrapes_{key}"] = json.dumps([round(s - t0, 2) for s in stamps[:12]])
         ref = row["t_revert_commit"] if not math.isnan(row["t_revert_commit"]) else t0
         out["prom_t_outofsync"] = _prom_first(q(f'argocd_app_info{{name="{app}",sync_status="OutOfSync"}}'), ref)
         out["prom_t_stable_ready"] = _prom_first(

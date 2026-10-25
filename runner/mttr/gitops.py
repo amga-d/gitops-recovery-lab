@@ -40,6 +40,20 @@ class Gitea:
         r.raise_for_status()
         return r.json()["commit"]["id"]
 
+    def set_webhooks(self, active: bool) -> None:
+        """Turn the push webhooks to Argo CD on or off. Off, Argo CD only learns
+        of a commit at its next poll."""
+        r = self.s.get(f"{self.base}/hooks", timeout=10)
+        r.raise_for_status()
+        for h in r.json():
+            if h["active"] != active:
+                self.s.patch(f"{self.base}/hooks/{h['id']}", json={"active": active}, timeout=10).raise_for_status()
+
+    def webhooks_active(self) -> bool:
+        r = self.s.get(f"{self.base}/hooks", timeout=10)
+        r.raise_for_status()
+        return all(h["active"] for h in r.json())
+
 
 def baseline_rollout(strategy: str) -> str:
     return (ROOT / "gitops" / "apps" / strategy / "rollout.yaml").read_text()

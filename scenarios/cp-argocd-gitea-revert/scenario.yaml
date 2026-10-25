@@ -1,0 +1,28 @@
+name: cp-argocd-gitea-revert
+description: >
+  A faulty release (30% HTTP 500) is rolled back by Argo Rollouts, but when
+  the operator commits the revert, Argo CD's repo-server cannot reach Gitea
+  for 120 s, so the corrective commit cannot be fetched.
+category: network
+surface: control-path
+expected_recovery: argocd      # after the partition heals, on Argo CD's retry or poll
+applies_to:
+  strategies: [canary]
+  sync_policies: [auto]
+trigger:
+  phase: during-rollout
+  at: applied
+target:
+  selector: release-under-test
+inject:
+  kind: git-commit
+  patch:
+    env:
+      ERROR_RATE: "0.3"
+  also:
+    - manifest: networkchaos.yaml
+      at: operator-revert      # created just before the revert commit
+      stop_after: 120s
+confirm: {kind: none}
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s

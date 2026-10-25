@@ -53,6 +53,23 @@ class Scenario:
         return seconds(self.spec.get("timeout", "600s"))
 
     @property
+    def also(self) -> list[dict]:
+        """Further chaos that lands at a later point of the trial (e.g. while the
+        operator's revert is being fetched), each with an optional stop_after."""
+        return self.inject.get("also") or []
+
+    @property
+    def setup(self) -> dict:
+        """State created before the fault and kept on purpose (e.g. an earlier
+        aborted release), instead of the clean history the reset leaves."""
+        return self.spec.get("setup") or {}
+
+    @property
+    def release_is_healthy(self) -> bool:
+        """The release under test carries no fault: a rollback is a false alarm."""
+        return bool(self.spec.get("release_is_healthy"))
+
+    @property
     def is_control(self) -> bool:
         return self.phase == "baseline" and self.target.get("selector") == "stable" \
             and self.spec.get("expected_recovery") == "kubernetes"
@@ -73,6 +90,11 @@ def load(name: str) -> Scenario:
         raise ValueError(f"{name}: unsupported trigger phase {spec['trigger']['phase']}")
     if spec["inject"]["kind"] not in ("git-commit", "chaos-mesh", "kubectl-patch"):
         raise ValueError(f"{name}: unsupported injector {spec['inject']['kind']}")
+    for extra in spec["inject"].get("also") or []:
+        if extra.get("at") != "operator-revert":
+            raise ValueError(f"{name}: inject.also supports only at: operator-revert")
+    if (spec.get("setup") or {}).get("kind") not in (None, "aborted-release"):
+        raise ValueError(f"{name}: unsupported setup {spec['setup']['kind']}")
     return Scenario(spec["name"], spec, path)
 
 

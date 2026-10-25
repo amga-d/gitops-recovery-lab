@@ -46,6 +46,25 @@ Injector kinds:
   and `${TARGET_POD}`.
 - `kubectl-patch`: a JSON patch applied to the live `resource` (bypassing Git).
 
+Optional fields:
+- `inject.patch` with `kind: chaos-mesh`: the release under test is faulty
+  *and* the chaos lands once it is live (two faults at once).
+- `inject.also`: further chaos created just before the scripted operator's
+  revert commit (`at: operator-revert`), each with its own `stop_after`, for
+  faults on the revert's way back to the cluster.
+- `setup: {kind: aborted-release, patch: ...}`: before the fault, commit a
+  release with `patch`, let Argo Rollouts abort it, revert, and keep its
+  ReplicaSet (the per-trial reset otherwise deletes that history). The trial
+  is invalid if the aborted ReplicaSet lost its `scale-down-deadline`
+  annotation.
+- `release_is_healthy: true`: the release under test carries no fault, so a
+  rollback of it is classed as a false rollback.
+- `target.selector: control-path`: documentation only; the chaos manifest
+  names the platform pods it targets.
+
+Conditions are combined in `experiment/design.yaml` (blocks of scenarios ×
+strategies × sync policies × revert paths); `make run` executes them.
+
 Rules:
 - Faults on the release under test use `phase: during-rollout`. Argo Rollouts
   only analyses and rolls back while an update is progressing.

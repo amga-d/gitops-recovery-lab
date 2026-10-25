@@ -1,0 +1,32 @@
+name: bad-image-after-abort
+description: >
+  An unpullable image is released after an earlier release was aborted and
+  rolled back, with that history kept. Argo Rollouts skips its progress
+  deadline while the old ReplicaSet still carries a scale-down-deadline
+  annotation, so the bad release may never be aborted.
+category: release
+surface: release
+expected_recovery: rollouts    # by the progress deadline, if it fires at all
+applies_to:
+  strategies: [canary, bluegreen, rolling]
+  sync_policies: [auto]
+setup:
+  kind: aborted-release        # commit a faulty release, let it abort, revert; keep its ReplicaSet
+  patch:
+    env:
+      ERROR_RATE: "0.3"
+trigger:
+  phase: during-rollout
+  at: applied
+target:
+  selector: release-under-test
+inject:
+  kind: git-commit
+  patch:
+    image: registry.invalid/mttr-app:missing
+confirm:
+  kind: pod-waiting
+  reasons: [ErrImagePull, ImagePullBackOff]
+  within: 60s
+cleanup: {kind: none}
+timeout: 300s                  # over three times the 90 s deadline: no abort by then is a stall
