@@ -252,7 +252,8 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     row["first_release_restart_s"] = t_restart - t_inject
     row["background_failed_requests"] = int(after.background_failed.sum())
     row["requests_in_outage"] = int(((main.t >= t_inject) & (main.t <= t_svc)).sum())
-    row["p95_latency_ms_baseline"] = float(main[main.t < t_inject].latency_ms.quantile(0.95)) if len(main) else NAN
+    base = main[(main.t >= meta.get("t_load_start", -math.inf)) & (main.t < t_inject)]
+    row["p95_latency_ms_baseline"] = float(base.latency_ms.quantile(0.95)) if len(base) else NAN
 
     # --- GitOps reconciliation ---------------------------------------------
     app_ev = [e for e in events if e["kind"] == "Application"]

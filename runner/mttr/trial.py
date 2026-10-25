@@ -19,12 +19,13 @@ import yaml
 
 from . import obs
 from .cluster import CHAOS, ROLLOUT, Cluster
-from .config import ROOT, Config
+from .config import ROOT, STRATEGIES, Config
 from .gitops import ArgoCD, Gitea, baseline_rollout, release_rollout
 from .scenarios import Scenario, seconds
 from .watcher import Watcher
 
 REPLICAS = 4
+APP_NAMESPACES = {f"mttr-{s}" for s in STRATEGIES}
 
 
 def log(msg: str) -> None:
@@ -84,6 +85,22 @@ class Runner:
         self.argocd = ArgoCD(self.cluster)
         self.grafana = obs.Grafana(cfg)
 
+    def pulling_pods(self) -> list[str]:
+        return [f"{p.metadata.namespace}/{p.metadata.name}"
+                for p in self.cluster.core.list_pod_for_all_namespaces().items
+                if any(c.state.waiting and c.state.waiting.reason in ("ErrImagePull", "ImagePullBackOff")
+                       for c in p.status.container_statuses or [])]
+
+    def reset_others(self, strategy: str) -> None:
+        """A trial that ends censored (e.g. a bad release that is never rolled
+        back) leaves its app stuck; return any such app to its baseline too, so
+        it neither holds resources nor pulls images during the next trial."""
+        stuck = {p.split("/")[0] for p in self.pulling_pods()}
+        for other in STRATEGIES:
+            if other != strategy and f"mttr-{other}" in stuck:
+                log(f"reset: {other} was left on a stuck release")
+                self.reset(other)
+
     # --- per-trial reset -------------------------------------------------
     def reset(self, strategy: str, timeout: float = 900) -> str:
         """Bring the strategy's app back to the baseline release: no chaos, Git
@@ -93,11 +110,9 @@ class Runner:
         for kind, k in CHAOS.items():
             for o in self.cluster.list(k, ns):
                 self.cluster.delete(k, ns, o["metadata"]["name"])
-        stuck = [f"{p.metadata.namespace}/{p.metadata.name}"
-                 for p in self.cluster.core.list_pod_for_all_namespaces().items
-                 if p.metadata.namespace != ns and any(
-                     (c.state.waiting and c.state.waiting.reason in ("ErrImagePull", "ImagePullBackOff"))
-                     for c in p.status.container_statuses or [])]
+        # The apps under test have their own reset (a stalled bad release is
+        # cleared there); every other pod must already have its image.
+        stuck = [p for p in self.pulling_pods() if p.split("/")[0] not in APP_NAMESPACES]
         if stuck:  # a trial must not depend on a registry pull
             raise RuntimeError(f"pods waiting on an image pull: {', '.join(stuck)}")
         if not self.gitea.webhooks_active():  # a poll trial that ended early
@@ -217,6 +232,7 @@ class Trial:
         cfg, sc = self.cfg, self.scenario
         self.out.mkdir(parents=True, exist_ok=True)
         log(f"trial {self.id}: {self.strategy} / {sc.name} / {self.policy}")
+        self.r.reset_others(self.strategy)
         self.v1 = self.r.reset(self.strategy)
         self.r.argocd.set_policy(self.app, self.policy)
         self.git_head = self.r.gitea.head()
@@ -225,10 +241,6 @@ class Trial:
                                      "nodes": obs.node_usage(self.r.cluster)}}
         self.w = Watcher(self.r.cluster, self.ns, self.app).start()
         time.sleep(2)
-        if self.scenario.setup:
-            self.setup_history()
-        self.meta["covariates"]["baseline_pods"] = {n: s["node"] for n, s in self.w.snapshot("Pod").items()}
-
         log_path = self.out / "requests.csv"
         streams = ["--stream", f"main={self.strategy}.mttr.lab:{cfg['LOAD_RPS']}"]
         if self.strategy == "bluegreen":
@@ -238,7 +250,12 @@ class Trial:
                               cwd=ROOT / "runner")
         sli = LiveSLI(log_path, cfg)
         try:
-            self.meta["t_load_start"] = time.time()
+            # A setup needs traffic: without it the release's error rate reads 0
+            # and a faulty setup release is promoted instead of aborted.
+            if self.scenario.setup:
+                self.setup_history()
+            self.meta["covariates"]["baseline_pods"] = {n: s["node"] for n, s in self.w.snapshot("Pod").items()}
+            self.meta["t_load_start"] = time.time()  # the baseline window starts after any setup
             time.sleep(cfg.num("BASELINE_S"))
             sli.poll()
             self.meta["baseline_success"] = round(sli.success(self.meta["t_load_start"] + 1, time.time() - 3), 4)
@@ -278,6 +295,11 @@ class Trial:
         old = self.rollout()["currentPodHash"]
         if not self.wait("setup release aborted", lambda: self.rollout().get("abort"), 300):
             raise RuntimeError("setup release was never aborted")
+        # Revert only once the abort's delayed scale-down has run. Reverted
+        # earlier, the release is orphaned before its scale-down deadline and
+        # the controller clears the annotation this history depends on.
+        self.wait("aborted release scaled down", lambda: not any(
+            s["hash"] == old and s["replicas"] for s in self.w.snapshot("ReplicaSet").values()), 180)
         self.act("setup-revert")
         self.git_head = self.r.gitea.write(self.path, baseline_rollout(self.strategy), f"setup revert {self.id}")
         if self.policy == "manual":

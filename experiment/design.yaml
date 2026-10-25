@@ -27,7 +27,8 @@ blocks:
     sync_policies: [auto, manual]
 
   - name: control-path               # faults on the GitOps tools' own connections
-    scenarios: [cp-rollouts-prometheus-healthy, cp-rollouts-prometheus-faulty, cp-argocd-gitea-revert]
+    scenarios: [cp-rollouts-prometheus-healthy, cp-rollouts-prometheus-faulty,
+                cp-rollouts-prometheus-healthy-long, cp-rollouts-prometheus-faulty-long, cp-argocd-gitea-revert]
     strategies: [canary]
     sync_policies: [auto]
 
