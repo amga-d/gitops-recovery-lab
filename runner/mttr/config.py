@@ -77,6 +77,8 @@ def load() -> Config:
     env = _read_env(ROOT / "config.env") | _read_env(ROOT / ".env")
     cfg = Config(env=env)
     cfg.server_ip = vm_ip(env["SERVER_VM"])
-    if os.environ.get("RESULTS_DIR"):
-        cfg.results_dir = pathlib.Path(os.environ["RESULTS_DIR"]).expanduser()
+    # Results usually live outside the repo; the path goes in the environment or .env.
+    results = os.environ.get("RESULTS_DIR") or env.get("RESULTS_DIR")
+    if results:
+        cfg.results_dir = pathlib.Path(results).expanduser()
     return cfg
