@@ -8,7 +8,7 @@ category: network
 surface: control-path
 expected_recovery: rollouts    # if at all, through the analysis error path
 applies_to:
-  strategies: [canary]
+  strategies: [canary, bluegreen, rolling]
   sync_policies: [auto]
 trigger:
   phase: during-rollout
