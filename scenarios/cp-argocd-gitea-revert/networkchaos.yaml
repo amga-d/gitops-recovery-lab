@@ -1,0 +1,20 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: repo-server-gitea-${TRIAL_ID}
+  namespace: ${NAMESPACE}
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces: [argocd]
+    labelSelectors:
+      app.kubernetes.io/name: argocd-repo-server
+  direction: both
+  target:
+    mode: all
+    selector:
+      namespaces: [gitea]
+      labelSelectors:
+        app.kubernetes.io/name: gitea
+  duration: 15m

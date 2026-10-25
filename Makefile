@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 S := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help up vms kubeconfig platform app-image seed runner-env trial pilot extract analyze status down destroy lint
+.PHONY: help up vms kubeconfig platform images app-image seed runner-env trial pilot run extract analyze status down destroy lint
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*## "} /^[a-z-]+:.*## / {printf "  \033[36m%-11s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -22,6 +22,9 @@ platform: ## Install or upgrade the platform (Gitea, monitoring, Argo CD, Rollou
 PY := .state/venv/bin/python
 MTTR := cd runner && ../$(PY) -m mttr
 
+images: ## Save every image on the running nodes to .state/images (later builds import them)
+	@$(S)/images.sh save
+
 app-image: ## Build the sample app and import it into every node
 	@$(S)/build-app.sh
 
@@ -33,11 +36,14 @@ runner-env: ## Create the Python environment for the runner and analysis
 	@[ -x $(PY) ] || uv venv -q -p python3 .state/venv
 	@VIRTUAL_ENV=.state/venv uv pip install -q -r runner/requirements.txt
 
-trial: ## One trial: make trial STRATEGY=canary SCENARIO=faulty-release SYNC=auto
-	@$(MTTR) trial --strategy $(STRATEGY) --scenario $(SCENARIO) --sync $(or $(SYNC),auto)
+trial: ## One trial: make trial STRATEGY=canary SCENARIO=faulty-release SYNC=auto REVERT=webhook
+	@$(MTTR) trial --strategy $(STRATEGY) --scenario $(SCENARIO) --sync $(or $(SYNC),auto) --revert-path $(or $(REVERT),webhook)
 
 pilot: ## Run or resume the randomised trial plan (REPS=3 SEED=...)
 	@$(MTTR) pilot --reps $(or $(REPS),3) $(if $(SEED),--seed $(SEED))
+
+run: ## Run or resume the main design (DESIGN=experiment/design.yaml REPS=7 SEED=... DRY=1)
+	@$(MTTR) run --design $(or $(DESIGN),$(CURDIR)/experiment/design.yaml) --reps $(or $(REPS),7) $(if $(SEED),--seed $(SEED)) $(if $(DRY),--dry-run)
 
 extract: ## Re-extract every recorded trial into all-trials.csv
 	@$(MTTR) extract

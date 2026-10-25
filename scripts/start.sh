@@ -37,6 +37,10 @@ for agent in "${AGENTS[@]}"; do
   wait_cloud_init "$agent" "$AGENT_SSH_USER"
 done
 
+# Saved images (make images) spare the nodes their registry pulls; containerd
+# is up once cloud-init has installed k3s, so import before waiting on pods.
+"$ROOT/scripts/images.sh" load
+
 "$ROOT/scripts/fetch-kubeconfig.sh"
 
 log "Waiting for all ${#ALL_VMS[@]} nodes to register and become Ready"

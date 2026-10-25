@@ -1,0 +1,27 @@
+name: cp-rollouts-prometheus-faulty
+description: >
+  A faulty release (30% HTTP 500) is analysed while the Argo Rollouts
+  controller cannot reach Prometheus, so its metric cannot show the fault.
+category: network
+surface: control-path
+expected_recovery: rollouts    # if at all, through the analysis error path
+applies_to:
+  strategies: [canary]
+  sync_policies: [auto]
+trigger:
+  phase: during-rollout
+  at: release-live
+target:
+  selector: control-path
+inject:
+  kind: chaos-mesh
+  manifest: networkchaos.yaml
+  stop_after: 120s
+  patch:                       # the release under test is faulty as well
+    env:
+      ERROR_RATE: "0.3"
+confirm:
+  kind: chaos-injected
+  within: 30s
+cleanup: {kind: chaos-mesh-delete}
+timeout: 600s

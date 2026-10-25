@@ -93,6 +93,16 @@ class Runner:
         for kind, k in CHAOS.items():
             for o in self.cluster.list(k, ns):
                 self.cluster.delete(k, ns, o["metadata"]["name"])
+        stuck = [f"{p.metadata.namespace}/{p.metadata.name}"
+                 for p in self.cluster.core.list_pod_for_all_namespaces().items
+                 if p.metadata.namespace != ns and any(
+                     (c.state.waiting and c.state.waiting.reason in ("ErrImagePull", "ImagePullBackOff"))
+                     for c in p.status.container_statuses or [])]
+        if stuck:  # a trial must not depend on a registry pull
+            raise RuntimeError(f"pods waiting on an image pull: {', '.join(stuck)}")
+        if not self.gitea.webhooks_active():  # a poll trial that ended early
+            log("reset: re-enabling the Git webhooks")
+            self.gitea.set_webhooks(True)
         path = f"{strategy}/rollout.yaml"
         content, _ = self.gitea.read(path)
         if yaml.safe_load(content) != yaml.safe_load(baseline_rollout(strategy)):
@@ -148,15 +158,20 @@ class Runner:
 
 class Trial:
     def __init__(self, runner: Runner, strategy: str, scenario: Scenario, policy: str,
-                 trial_id: str, outdir: pathlib.Path):
+                 trial_id: str, outdir: pathlib.Path, revert_path: str = "webhook"):
         self.r, self.cfg = runner, runner.cfg
         self.strategy, self.scenario, self.policy = strategy, scenario, policy
+        if revert_path not in ("webhook", "poll"):
+            raise ValueError(f"unknown revert path {revert_path!r}")
+        self.revert_path = revert_path
         self.id, self.out = trial_id, outdir
         self.ns = self.app = f"mttr-{strategy}"
         self.path = f"{strategy}/rollout.yaml"
         self.actions: list[dict] = []
         self.meta: dict = {"trial_id": trial_id, "strategy": strategy, "scenario": scenario.name,
-                           "sync_policy": policy, "inject_kind": scenario.inject["kind"]}
+                           "sync_policy": policy, "revert_path": revert_path,
+                           "inject_kind": scenario.inject["kind"],
+                           "release_is_healthy": scenario.release_is_healthy}
         self.delay = self.cfg.num("OPERATOR_DELAY_S")
 
     def act(self, action: str, **details) -> float:
@@ -186,13 +201,16 @@ class Trial:
         return False
 
     def converged(self) -> bool:
-        """Git, Argo CD and the cluster all back at the baseline release."""
+        """Git, Argo CD and the cluster all at the intended release: the
+        baseline, or a healthy release under test that was promoted and never
+        reverted (nothing was wrong with it)."""
         a, r = self.application(), self.rollout()
         pods = [p for p in self.w.snapshot("Pod").values() if not p["deleted"]]
+        want = self.v2 if self.scenario.release_is_healthy and "git_revert" not in self.meta and self.v2 else self.v1
         return (a.get("sync") == "Synced" and a.get("health") == "Healthy" and a.get("revision") == self.git_head
                 and r.get("phase") == "Healthy" and not r.get("abort")
-                and r.get("currentPodHash") == self.v1 and r.get("stableRS") == self.v1
-                and len(pods) == REPLICAS and all(p["ready"] and p["hash"] == self.v1 for p in pods))
+                and r.get("currentPodHash") == want and r.get("stableRS") == want
+                and len(pods) == REPLICAS and all(p["ready"] and p["hash"] == want for p in pods))
 
     # --- the trial ----------------------------------------------------------
     def run(self) -> dict:
@@ -207,6 +225,8 @@ class Trial:
                                      "nodes": obs.node_usage(self.r.cluster)}}
         self.w = Watcher(self.r.cluster, self.ns, self.app).start()
         time.sleep(2)
+        if self.scenario.setup:
+            self.setup_history()
         self.meta["covariates"]["baseline_pods"] = {n: s["node"] for n, s in self.w.snapshot("Pod").items()}
 
         log_path = self.out / "requests.csv"
@@ -229,6 +249,8 @@ class Trial:
             for kind, k in CHAOS.items():
                 for o in self.r.cluster.list(k, self.ns):
                     self.r.cluster.delete(k, self.ns, o["metadata"]["name"])
+            if self.revert_path == "poll":
+                self.r.gitea.set_webhooks(True)
             lg.terminate()
             lg.wait(timeout=10)
             self.w.stop()
@@ -239,10 +261,46 @@ class Trial:
             (self.out / "meta.json").write_text(json.dumps(self.meta, indent=1))
         return self.meta
 
+    def setup_history(self) -> None:
+        """Leave an aborted release behind, as an earlier failed deploy would:
+        commit a faulty release, let Argo Rollouts abort it, revert, and wait
+        until it is scaled down. Not timed; the fault comes afterwards."""
+        setup = self.scenario.setup
+        self.act("setup-release")
+        self.r.gitea.write(self.path, release_rollout(self.strategy, f"{self.id}-setup", setup.get("patch")),
+                           f"setup release {self.id}")
+        if self.policy == "manual":
+            self.wait("setup release OutOfSync", lambda: self.application().get("sync") == "OutOfSync", 60)
+            self.r.argocd.sync(self.app)
+        if not self.wait("setup release applied",
+                         lambda: self.rollout().get("currentPodHash") not in (None, self.v1), 120):
+            raise RuntimeError("setup release never reached the cluster")
+        old = self.rollout()["currentPodHash"]
+        if not self.wait("setup release aborted", lambda: self.rollout().get("abort"), 300):
+            raise RuntimeError("setup release was never aborted")
+        self.act("setup-revert")
+        self.git_head = self.r.gitea.write(self.path, baseline_rollout(self.strategy), f"setup revert {self.id}")
+        if self.policy == "manual":
+            self.wait("setup revert OutOfSync", lambda: self.application().get("sync") == "OutOfSync", 60)
+            self.r.argocd.sync(self.app)
+        back = lambda: (self.rollout().get("phase") == "Healthy" and not self.rollout().get("abort")
+                        and self.rollout().get("stableRS") == self.v1 and self.rs_ready(self.v1) >= REPLICAS)
+        if not self.wait("baseline after setup", back, 300):
+            raise RuntimeError("baseline did not return after the setup release")
+        self.wait("setup release scaled down", lambda: not any(
+            s["hash"] == old and s["replicas"] for s in self.w.snapshot("ReplicaSet").values()), 180)
+        rs = [r for r in self.r.cluster.apps.list_namespaced_replica_set(self.ns).items
+              if r.metadata.labels.get("rollouts-pod-template-hash") == old]
+        kept = bool(rs) and "scale-down-deadline" in (rs[0].metadata.annotations or {})
+        self.meta |= {"setup_hash": old, "history_precondition": kept}
+        if not kept:  # the history this condition needs is absent: not a measurement of it
+            self.meta["confirmed"] = False
+        self.act("setup-done", hash=old, annotation_kept=kept)
+
     def inject(self) -> None:
         sc, inj = self.scenario, self.scenario.inject
         if sc.phase == "during-rollout":
-            patch = inj.get("patch") if inj["kind"] == "git-commit" else None
+            patch = inj.get("patch") if inj["kind"] in ("git-commit", "chaos-mesh") else None
             content = release_rollout(self.strategy, self.id, patch)
             self.act("commit-release", release=self.id)
             sha = self.r.gitea.write(self.path, content, f"release {self.id}")
@@ -277,15 +335,22 @@ class Trial:
             target["TARGET_POD"] = random.choice(pods)
             self.meta["target_pod"] = target["TARGET_POD"]
         if inj["kind"] == "chaos-mesh":
-            values = {"TRIAL_ID": self.id.lower(), "NAMESPACE": self.ns, **target}
-            for doc in sc.render(inj["manifest"], values):
-                doc.setdefault("metadata", {}).setdefault("labels", {})["mttr.lab/trial"] = self.id.lower()
-                self.r.cluster.create(CHAOS[doc["kind"]], self.ns, doc)
+            self.create_chaos(inj["manifest"], target)
             self.meta["t_inject_action"] = self.act("chaos-created", **target)
         elif inj["kind"] == "kubectl-patch":
             self.r.cluster.json_patch(inj["resource"], self.ns, "mttr-app", inj["patch"])
             self.meta["t_inject_action"] = self.act("live-patched")
         self.meta["v2_hash"] = self.v2
+
+    def create_chaos(self, manifest: str, target: dict) -> list[tuple[str, str]]:
+        """Create a scenario's Chaos Mesh resources; returns (kind, name) pairs."""
+        values = {"TRIAL_ID": self.id.lower(), "NAMESPACE": self.ns, **target}
+        made = []
+        for doc in self.scenario.render(manifest, values):
+            doc.setdefault("metadata", {}).setdefault("labels", {})["mttr.lab/trial"] = self.id.lower()
+            self.r.cluster.create(CHAOS[doc["kind"]], self.ns, doc)
+            made.append((doc["kind"], doc["metadata"]["name"]))
+        return made
 
     def recover(self, sli: LiveSLI) -> None:
         """Watch the recovery stack act; play the scripted operator; stop once
@@ -299,6 +364,7 @@ class Trial:
         confirmed = None if sc.spec.get("confirm", {}).get("kind", "none") == "none" else False
         stopped = False
         good_since = None
+        late_chaos: list[tuple[float | None, list[tuple[str, str]]]] = []
         while True:
             now = time.time()
             sli.poll()
@@ -327,11 +393,25 @@ class Trial:
                     t_failure = now
                     self.act("operator-sees-failure", reason="rollout aborted" if r.get("abort") else "SLO alert")
                 if t_failure and now >= t_failure + self.delay:
+                    for extra in sc.also:  # faults that hit the revert's way back to the cluster
+                        names = self.create_chaos(extra["manifest"], {"TARGET_HASH": self.v2 or self.v1})
+                        until = now + seconds(extra["stop_after"]) if extra.get("stop_after") else None
+                        late_chaos.append((until, names))
+                        self.act("revert-chaos-created", manifests=names)
+                    if self.revert_path == "poll":
+                        self.r.gitea.set_webhooks(False)
+                        self.act("webhooks-disabled")
                     self.act("operator-revert-commit")
                     self.git_head = self.r.gitea.write(self.path, baseline_rollout(self.strategy),
                                                        f"revert release {self.id}")
                     self.meta["git_revert"] = self.git_head
                     git_is_baseline = True
+            for i, (until, names) in enumerate(late_chaos):
+                if until and now >= until:
+                    for kind, name in names:
+                        self.r.cluster.delete(CHAOS[kind], self.ns, name)
+                    late_chaos[i] = (None, [])
+                    self.act("revert-chaos-stopped")
             if self.policy == "manual":
                 if a.get("sync") == "OutOfSync" and not a.get("operation") and a.get("opPhase") != "Running":
                     if t_oos is None:
@@ -347,7 +427,8 @@ class Trial:
 
             # Recovered: converged for `hold` seconds, and no SLO breach in the
             # last `hold` seconds of settled request bins.
-            if self.converged() and (not stop_after or stopped):
+            late_done = all(until is None for until, _ in late_chaos)
+            if self.converged() and (not stop_after or stopped) and late_done:
                 good_since = good_since or now
             else:
                 good_since = None

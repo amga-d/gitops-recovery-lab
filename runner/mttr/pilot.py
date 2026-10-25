@@ -36,6 +36,44 @@ def make_plan(reps: int, seed: int, names: list[str] | None) -> list[dict]:
     return plan
 
 
+def design_cells(path: pathlib.Path) -> list[dict]:
+    """Expand a design file into cells. Each block lists scenarios, strategies,
+    sync policies and revert paths; a cell is one combination of them."""
+    import yaml
+    spec = yaml.safe_load(path.read_text())
+    cells, seen = [], set()
+    for block in spec["blocks"]:
+        for sc in block["scenarios"]:
+            load(sc)  # fail early on an unknown or invalid scenario
+            for s in block.get("strategies", STRATEGIES):
+                for p in block.get("sync_policies", ["auto"]):
+                    for rp in block.get("revert_paths", ["webhook"]):
+                        key = (s, sc, p, rp)
+                        if key in seen:  # a cell shared by two blocks runs once
+                            continue
+                        seen.add(key)
+                        cells.append({"block": block["name"], "strategy": s, "scenario": sc,
+                                      "sync_policy": p, "revert_path": rp})
+    return cells
+
+
+def make_design_plan(cells: list[dict], reps: int, seed: int) -> list[dict]:
+    """Randomised blocks over design cells, as make_plan does for conditions."""
+    rng = random.Random(seed)
+    plan = []
+    for rep in range(1, reps + 1):
+        block = cells[:]
+        rng.shuffle(block)
+        for c in block:
+            plan.append({"trial_id": f"T{len(plan) + 1:03d}", "rep": rep, **c})
+    return plan
+
+
+def condition_name(item: dict) -> str:
+    name = f"{item['strategy']}__{item['scenario']}__{item['sync_policy']}"
+    return name if item.get("revert_path", "webhook") == "webhook" else f"{name}__{item['revert_path']}"
+
+
 def append_csv(path: pathlib.Path, row: dict) -> None:
     exists = path.exists()
     fields = list(row)
@@ -70,9 +108,10 @@ def run_plan(cfg: Config, outdir: pathlib.Path, plan: list[dict], retries: int =
             continue
         if d.exists() and not (d / "row.json").exists():
             d.rename(d.with_name(f"{tid}.aborted-{int(time.time())}"))
-        trial = Trial(runner, item["strategy"], load(item["scenario"]), item["sync_policy"], tid, d)
+        trial = Trial(runner, item["strategy"], load(item["scenario"]), item["sync_policy"], tid, d,
+                      revert_path=item.get("revert_path", "webhook"))
         trial.meta |= {"order": plan.index(next(p for p in plan if p["trial_id"] == item["trial_id"])) + 1,
-                       "rep": item["rep"], "attempt": item["attempt"]}
+                       "rep": item["rep"], "attempt": item["attempt"], "block": item.get("block")}
         try:
             trial.run()
             row = extract(d, cfg, prom)
@@ -89,7 +128,7 @@ def run_plan(cfg: Config, outdir: pathlib.Path, plan: list[dict], retries: int =
         (d / "row.json").write_text(json.dumps(row, indent=1, default=str))
         append_csv(outdir / "all-trials.csv", row)
         if row["valid"]:
-            append_csv(outdir / "conditions" / f"{item['strategy']}__{item['scenario']}__{item['sync_policy']}.csv", row)
+            append_csv(outdir / "conditions" / f"{condition_name(item)}.csv", row)
         elif item["attempt"] <= retries:
             queue.append(dict(item, attempt=item["attempt"] + 1))
         log(f"trial {tid}: MTTR_full={row['mttr_full_s']:.1f}s MTTR_service={row['mttr_service_s']:.1f}s "

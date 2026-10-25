@@ -76,7 +76,12 @@ class Config:
 def load() -> Config:
     env = _read_env(ROOT / "config.env") | _read_env(ROOT / ".env")
     cfg = Config(env=env)
-    cfg.server_ip = vm_ip(env["SERVER_VM"])
+    # Offline work (re-extraction, plan dry runs) needs no running VM; anything
+    # that talks to the lab fails clearly on the empty address instead.
+    try:
+        cfg.server_ip = vm_ip(env["SERVER_VM"])
+    except (subprocess.CalledProcessError, RuntimeError):
+        cfg.server_ip = ""
     # Results usually live outside the repo; the path goes in the environment or .env.
     results = os.environ.get("RESULTS_DIR") or env.get("RESULTS_DIR")
     if results:

@@ -1,0 +1,42 @@
+# The main experiment: every cell is one combination of scenario, strategy,
+# sync policy and revert path. `python -m mttr run --design experiment/design.yaml`
+# runs each cell `--reps` times in randomised blocks; a cell listed in two
+# blocks runs once.
+blocks:
+  - name: core                       # release faults under every strategy
+    scenarios: [faulty-release, bad-image, crashloop, network-partition]
+    strategies: [canary, bluegreen, rolling]
+    sync_policies: [auto]
+    revert_paths: [webhook]
+
+  - name: revert-path                # how the corrective revert reaches the cluster
+    scenarios: [faulty-release]
+    strategies: [canary]
+    sync_policies: [auto]
+    revert_paths: [webhook, poll]
+
+  - name: revert-path                # ...or waits for an operator's sync
+    scenarios: [faulty-release]
+    strategies: [canary]
+    sync_policies: [manual]
+    revert_paths: [webhook]
+
+  - name: drift                      # out-of-band change: self-heal vs operator sync
+    scenarios: [config-drift]
+    strategies: [canary, bluegreen, rolling]
+    sync_policies: [auto, manual]
+
+  - name: control-path               # faults on the GitOps tools' own connections
+    scenarios: [cp-rollouts-prometheus-healthy, cp-rollouts-prometheus-faulty, cp-argocd-gitea-revert]
+    strategies: [canary]
+    sync_policies: [auto]
+
+  - name: history                    # a bad release after an earlier aborted one
+    scenarios: [bad-image-after-abort]
+    strategies: [canary, bluegreen, rolling]
+    sync_policies: [auto]
+
+  - name: baselines                  # Kubernetes-only recovery, no rollout
+    scenarios: [control-stable-crash, control-stable-partition]
+    strategies: [canary]
+    sync_policies: [auto]
