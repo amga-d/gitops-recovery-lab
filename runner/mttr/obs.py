@@ -81,6 +81,23 @@ def host_memory() -> dict:
             "host_load1": round(__import__("os").getloadavg()[0], 2)}
 
 
+CPU_MILLI = {"n": 1e-6, "u": 1e-3, "m": 1.0}
+MEM_MIB = {"Ki": 1 / 1024, "Mi": 1.0, "Gi": 1024.0}
+
+
+def cpu_millicores(q: str) -> float:
+    # metrics-server picks the suffix per value (n, u or m), so any of them can appear.
+    if q[-1:] in CPU_MILLI:
+        return float(q[:-1]) * CPU_MILLI[q[-1]]
+    return float(q) * 1000
+
+
+def mem_mib(q: str) -> float:
+    if q[-2:] in MEM_MIB:
+        return float(q[:-2]) * MEM_MIB[q[-2:]]
+    return float(q) / 2**20
+
+
 def node_usage(cluster: Cluster) -> dict[str, dict]:
     try:
         items = cluster.custom.list_cluster_custom_object("metrics.k8s.io", "v1beta1", "nodes")["items"]
@@ -88,8 +105,11 @@ def node_usage(cluster: Cluster) -> dict[str, dict]:
         return {}
     out = {}
     for n in items:
-        cpu, mem = n["usage"]["cpu"], n["usage"]["memory"]
-        cpu_m = int(cpu[:-1]) / 1e6 if cpu.endswith("n") else float(cpu.rstrip("m"))
-        mem_mi = int(mem[:-2]) / 1024 if mem.endswith("Ki") else float(mem.rstrip("Mi"))
-        out[n["metadata"]["name"]] = {"cpu_m": round(cpu_m), "mem_mib": round(mem_mi)}
+        # A covariate must never stop a trial, so an unreadable value is recorded as missing.
+        try:
+            usage = {"cpu_m": round(cpu_millicores(n["usage"]["cpu"])),
+                     "mem_mib": round(mem_mib(n["usage"]["memory"]))}
+        except (KeyError, ValueError):
+            usage = {"cpu_m": None, "mem_mib": None}
+        out[n["metadata"]["name"]] = usage
     return out
