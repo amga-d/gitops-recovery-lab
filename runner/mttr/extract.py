@@ -244,7 +244,8 @@ def extract(d: pathlib.Path, cfg: Config, prom: obs.Prometheus | None = None) ->
     main = req[req.stream == "main"]
     after = main[main.t >= t_inject]
     row["failed_requests"] = int(after.fault_failed.sum())
-    rel_fail = after[after.fault_failed & after.hash.isin(targets)]
+    # Any stream counts: a blue-green release only ever answers the preview.
+    rel_fail = req[(req.t >= t_inject) & req.fault_failed & req.hash.isin(targets)]
     row["t_first_fault_response"] = float(rel_fail.t.min()) if len(rel_fail) else NAN
     row["first_fault_response_s"] = row["t_first_fault_response"] - t_inject
     t_restart = _first([e for e in events if e["kind"] == "Pod"],
