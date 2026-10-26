@@ -1,12 +1,14 @@
 """Statistics and report for a set of trials.
 
-- descriptive statistics per condition (mean, median, SD, CV, P95);
-- the pilot's sample-size estimate: the smallest N whose expected 95% CI
-  half-width of mean MTTR meets the precision threshold, per condition;
+- descriptive statistics per condition (mean, median, SD, CV, P95), where a
+  condition is scenario x strategy x sync policy x revert path;
+- the precision check per condition: the 95% CI half-width of mean MTTR
+  against the threshold (and, for a pilot, the N that would meet it);
 - running-mean stability;
 - Kruskal-Wallis across strategies within each scenario x sync cell, Holm
   across cells, Dunn post-hoc with Bonferroni, epsilon-squared and Cliff's delta;
-- aligned-rank-transform ANOVA for strategy x sync per scenario;
+- aligned-rank-transform ANOVA where two factors are crossed: strategy x
+  sync policy (drift) and strategy x outage length (control path);
 - rollback success rate with a Wilson 95% CI;
 - Kaplan-Meier per strategy with censoring, and a log-rank test.
 """
@@ -24,10 +26,13 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+from . import model
 from .config import load
 
 PRIMARY = "mttr_full_s"
-COND = ["scenario", "strategy", "sync_policy"]
+COND = ["scenario", "strategy", "sync_policy", "revert_path"]
+# Control-path scenarios that differ only in outage length, for the crossed ART.
+OUTAGE_LENGTH = {"cp-rollouts-prometheus-faulty": "120s", "cp-rollouts-prometheus-faulty-long": "300s"}
 
 
 def precision(mean: float) -> float:
@@ -43,6 +48,12 @@ def n_required(sd: float, mean: float, n_max: int = 200) -> int:
         if stats.t.ppf(0.975, n - 1) * sd / math.sqrt(n) <= e:
             return n
     return n_max
+
+
+def half_width(sd: float, n: int) -> float:
+    if not np.isfinite(sd) or n < 2:
+        return np.nan
+    return stats.t.ppf(0.975, n - 1) * sd / math.sqrt(n)
 
 
 def wilson(k: int, n: int) -> tuple[float, float]:
@@ -199,10 +210,11 @@ def analyze(out: pathlib.Path) -> None:
     df = df[df["valid"].astype(str) == "True"].copy()
     # A retried trial replaces its failed attempt; keep the last valid one per plan slot.
     df["slot"] = df.trial_id.str.extract(r"^(T\d+)")[0]
+    df["revert_path"] = df.get("revert_path", pd.Series("webhook", index=df.index)).fillna("webhook")
     df = df.sort_values("attempt").groupby("slot").tail(1)
     figs = out / "figures"
     figs.mkdir(exist_ok=True)
-    rep = ["# Pilot results", "", f"Valid trials: {len(df)}", ""]
+    rep = ["# Results", "", f"Valid trials: {len(df)}", ""]
 
     # --- descriptive statistics and the N estimate per condition ----------------
     rows = []
@@ -211,7 +223,8 @@ def analyze(out: pathlib.Path) -> None:
         trig = g.rollback_triggered.astype(str) == "True"
         succ = g.rollback_success.astype(str) == "True"
         lo, hi = wilson(int(succ.sum()), int(trig.sum()) if trig.any() else 0)
-        rows.append({"scenario": key[0], "strategy": key[1], "sync": key[2], "n": full.get("n", 0),
+        hw = half_width(full.get("sd", np.nan), full.get("n", 0))
+        rows.append({"scenario": key[0], "strategy": key[1], "sync": key[2], "revert": key[3], "n": full.get("n", 0),
                      "censored": int((g.censored.astype(str) == "True").sum()),
                      "MTTR_full mean": full.get("mean"), "median": full.get("median"), "SD": full.get("sd"),
                      "CV": full.get("cv"), "P95": full.get("p95"),
@@ -221,14 +234,17 @@ def analyze(out: pathlib.Path) -> None:
                      "cause": "/".join(sorted(set(g.trigger_cause.astype(str)))),
                      "rollback ok": f"{int(succ.sum())}/{int(trig.sum())}",
                      "success CI": f"[{fmt(lo, 2)}, {fmt(hi, 2)}]" if trig.any() else "–",
+                     "CI half-width": hw,
+                     "precision met": bool(hw <= precision(full["mean"])) if np.isfinite(hw) else "–",
                      "N required": n_required(full.get("sd", np.nan), full.get("mean", np.nan)) if full.get("n", 0) > 1 else np.nan})
     desc = pd.DataFrame(rows)
     desc.to_csv(out / "summary-by-condition.csv", index=False)
     rep += ["## Per condition (seconds)", "",
             "Precision threshold for N: 95% CI half-width of mean MTTR_full ≤ max(10% of the mean, 10 s).", "",
             md_table(desc), ""]
-    n_star = int(np.nanmax(desc["N required"])) if desc["N required"].notna().any() else None
-    rep += [f"**N for the main runs (largest per-condition requirement): {n_star}**", ""]
+    met = desc["precision met"].astype(str)
+    rep += [f"**Precision met in {int((met == 'True').sum())} of {int(met.isin(['True', 'False']).sum())} conditions "
+            f"with a finite MTTR_full.** N required is the pilot-style estimate, for reference.", ""]
 
     # --- success criteria per condition --------------------------------------
     # Trigger-latency consistency and rollback success only mean something
@@ -241,7 +257,7 @@ def analyze(out: pathlib.Path) -> None:
             continue
         lat = describe(g.rollback_trigger_latency_s)
         succ = (g.rollback_success.astype(str) == "True").sum() / trig.sum()
-        crit.append({"scenario": key[0], "strategy": key[1], "sync": key[2], "detected by": "/".join(sorted(causes)),
+        crit.append({"scenario": key[0], "strategy": key[1], "sync": key[2], "revert": key[3], "detected by": "/".join(sorted(causes)),
                      "trigger CV": lat.get("cv"), "CV < 0.30": bool(lat.get("cv", np.nan) < 0.30),
                      "success rate": succ, "success ≥ 0.80": bool(succ >= 0.80)})
     if crit:
@@ -265,7 +281,7 @@ def analyze(out: pathlib.Path) -> None:
 
     # --- strategy comparison within each scenario x sync cell -----------------
     tests = []
-    for (scn, sync), g in df.groupby(["scenario", "sync_policy"]):
+    for (scn, sync, rp), g in df.groupby(["scenario", "sync_policy", "revert_path"]):
         groups = {s: gg[PRIMARY].dropna().values for s, gg in g.groupby("strategy")}
         groups = {k: v for k, v in groups.items() if len(v)}
         if len(groups) < 2 or sum(len(v) for v in groups.values()) <= len(groups):
@@ -276,7 +292,7 @@ def analyze(out: pathlib.Path) -> None:
         else:
             h, p = stats.kruskal(*groups.values())
         n, k = len(allv), len(groups)
-        tests.append({"scenario": scn, "sync": sync, "H": h, "p": p, "eps2": (h - k + 1) / (n - k) if n > k else np.nan,
+        tests.append({"scenario": scn, "sync": sync, "revert": rp, "H": h, "p": p, "eps2": (h - k + 1) / (n - k) if n > k else np.nan,
                       "n": n, "dunn": dunn(groups)})
     if tests:
         for t, adj in zip(tests, holm([t["p"] for t in tests])):
@@ -284,15 +300,39 @@ def analyze(out: pathlib.Path) -> None:
         kw = pd.DataFrame([{k: v for k, v in t.items() if k != "dunn"} for t in tests])
         kw.to_csv(out / "kruskal-wallis.csv", index=False)
         rep += ["## Kruskal-Wallis across strategies (MTTR_full), Holm across cells", "", md_table(kw, 3), ""]
-        dd = pd.DataFrame([{"scenario": t["scenario"], "sync": t["sync"], **d} for t in tests for d in t["dunn"]])
+        dd = pd.DataFrame([{"scenario": t["scenario"], "sync": t["sync"], "revert": t["revert"], **d}
+                           for t in tests for d in t["dunn"]])
         dd.to_csv(out / "dunn.csv", index=False)
         rep += ["## Dunn post-hoc (Bonferroni) with Cliff's δ", "", md_table(dd, 3), ""]
 
+    # --- detection-latency model ----------------------------------------------
+    mc = model.check(out, df)
+    if len(mc):
+        mc.to_csv(out / "model-check.csv", index=False)
+        per = mc.groupby(["scenario", "strategy", "sync", "revert"]).agg(
+            n=("hit", "size"), hits=("hit", "sum"), no_prediction=("predicted_s", lambda v: int(v.isna().sum())),
+            bias_median=("bias_s", "median"), bias_max_abs=("bias_s", lambda v: v.abs().max())).reset_index()
+        rep += ["## Detection-latency model (per-trial rule, no fitted parameter)", "",
+                f"Hit (|observed - predicted| <= {model.HIT_S:g} s) in **{int(mc.hit.sum())} of {len(mc)}** "
+                f"analysis-detected trials ({mc.hit.mean():.1%}), ingestion margin {model.INGEST_S:g} s.", "",
+                md_table(per, 2), ""]
+        sweep = [{"ingestion margin (s)": d, "hit rate": model.check(out, df, d).hit.mean()}
+                 for d in (0.0, 0.25, 0.5, 0.75, 1.0)]
+        rep += ["Sensitivity to the ingestion margin (exploratory):", "", md_table(pd.DataFrame(sweep), 3), ""]
+
     # --- interaction: aligned rank transform ANOVA ------------------------------
+    # Only where the two factors are fully crossed: elsewhere a sync or length
+    # level exists for one strategy only and the interaction is not estimable.
     arts = []
-    for scn, g in df.groupby("scenario"):
-        for eff, r in art_anova(g, PRIMARY, "strategy", "sync_policy").items():
-            arts.append({"scenario": scn, "effect": eff, **r})
+    hook = df[df.revert_path == "webhook"]
+    for scn, g in hook.groupby("scenario"):
+        if g.groupby("strategy").sync_policy.nunique().min() > 1:
+            for eff, r in art_anova(g, PRIMARY, "strategy", "sync_policy").items():
+                arts.append({"design": scn, "factors": "strategy x sync", "effect": eff, **r})
+    cp = hook[hook.scenario.isin(OUTAGE_LENGTH)].assign(outage=lambda d: d.scenario.map(OUTAGE_LENGTH))
+    if len(cp) and cp.groupby("strategy").outage.nunique().min() > 1:
+        for eff, r in art_anova(cp, PRIMARY, "strategy", "outage").items():
+            arts.append({"design": "cp-rollouts-prometheus-faulty", "factors": "strategy x outage", "effect": eff, **r})
     if arts:
         art = pd.DataFrame(arts)
         art.to_csv(out / "art-anova.csv", index=False)
@@ -300,7 +340,8 @@ def analyze(out: pathlib.Path) -> None:
 
     # --- censoring: Kaplan-Meier per strategy and log-rank --------------------
     lr = []
-    for scn, g in df.groupby("scenario"):
+    for (scn, sync, rp), g in df.groupby(["scenario", "sync_policy", "revert_path"]):
+        name = "-".join([scn] + ([sync] if sync != "auto" else []) + ([rp] if rp != "webhook" else []))
         fig, ax = plt.subplots(figsize=(5, 3.2))
         groups = {}
         for s, gg in g.groupby("strategy"):
@@ -311,10 +352,10 @@ def analyze(out: pathlib.Path) -> None:
             groups[s] = (t, ev)
             x, y = kaplan_meier(t, ev)
             ax.step(x, y, where="post", label=s)
-        ax.set_xlabel("seconds since injection"); ax.set_ylabel("not yet recovered"); ax.set_title(scn)
-        ax.legend(); fig.tight_layout(); fig.savefig(figs / f"km-{scn}.png", dpi=120); plt.close(fig)
+        ax.set_xlabel("seconds since injection"); ax.set_ylabel("not yet recovered"); ax.set_title(name)
+        ax.legend(); fig.tight_layout(); fig.savefig(figs / f"km-{name}.png", dpi=120); plt.close(fig)
         if len(groups) > 1:
-            lr.append({"scenario": scn, **logrank(groups)})
+            lr.append({"scenario": scn, "sync": sync, "revert": rp, **logrank(groups)})
     if lr:
         rep += ["## Log-rank across strategies (MTTR_full, censored at timeout)", "", md_table(pd.DataFrame(lr), 3), ""]
 
@@ -335,8 +376,8 @@ def analyze(out: pathlib.Path) -> None:
         for ax, scn in zip(np.atleast_1d(axes), scns):
             g = df[df.scenario == scn]
             labels, data = [], []
-            for (s, p), gg in g.groupby(["strategy", "sync_policy"]):
-                labels.append(f"{s[:4]}/{p[:3]}"); data.append(gg[metric].dropna().values)
+            for (s, p, rp), gg in g.groupby(["strategy", "sync_policy", "revert_path"]):
+                labels.append(f"{s[:4]}/{p[:3]}" + ("/poll" if rp == "poll" else "")); data.append(gg[metric].dropna().values)
             ax.boxplot(data, tick_labels=labels, showmeans=True)
             ax.set_title(scn, fontsize=9); ax.tick_params(axis="x", rotation=60, labelsize=7)
         np.atleast_1d(axes)[0].set_ylabel(metric)
