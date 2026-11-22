@@ -52,6 +52,7 @@ kc apply -f "$ROOT/gitops/platform/" >/dev/null
 
 # application <name> <path> <namespace>: auto-sync is the default; the runner
 # switches the policy per trial.
+# TODO:  This template should be defined as a YAML file in gitops/platform and applied with kubectl apply -f.
 application() {
   cat <<EOF
 apiVersion: argoproj.io/v1alpha1
