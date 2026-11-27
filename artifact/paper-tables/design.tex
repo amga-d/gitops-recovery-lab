@@ -1,0 +1,23 @@
+% written by hand (not generated): design blocks
+\begin{table}[t]
+\caption{Design blocks (7 trials per cell; C/B/R = canary, blue-green, rolling; automated sync and webhook unless stated).}
+\label{tab:design}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\columnwidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule
+Block (cells) & Strat. & Fault or what is varied \\
+\midrule
+Core (12) & C, B, R & faulty release; bad image; crash loop; dependency partition \\
+Revert path (2) & C & faulty release; revert picked up by polling, or manual sync \\
+Drift (6) & C, B, R & live pod template patched; automated or manual sync \\
+Control path (9) & C, B, R & Rollouts--Prometheus cut of 120 or 300\,s; faulty release \\
+ & C & same, healthy release; Argo CD--Gitea cut at revert \\
+History (3) & C, B, R & bad image after an aborted release (stale annotation kept) \\
+Controls (2) & C & stable pod crashed or partitioned, no rollout (artifact only) \\
+\midrule
+\multicolumn{3}{@{}>{\raggedright\arraybackslash}p{\columnwidth}@{}}{New-release traffic (load 20\,req/s): canary 5\,\% (${\approx}1$\,req/s), rolling 25\,\% (${\approx}5$\,req/s), blue-green preview probe 2\,req/s.} \\
+\bottomrule
+\end{tabularx}
+\end{table}

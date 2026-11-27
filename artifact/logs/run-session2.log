@@ -1,0 +1,1601 @@
+resuming the plan in <workspace>/gitops-mttr-research/v2/results/main/plan.json (238 trials)
+22:49:42 trial T028: bluegreen / config-drift / manual
+22:50:19   trial-start 
+22:50:19   live-patched 
+22:50:20   operator-sees-outofsync 
+22:51:05   operator-sync 
+22:51:06   operator-sees-outofsync 
+22:52:06   trial-end 
+22:52:06 trial T028: MTTR_full=47.2s MTTR_service=0.0s trigger=none latency=nans valid=True
+22:52:06 trial T084: canary / bad-image / auto
+22:52:43   trial-start 
+22:52:43   commit-release {"release": "T084"}
+22:52:48   release-applied {"hash": "5cd78fbcdc"}
+22:52:50   fault-confirmed 
+22:54:19   operator-sees-failure {"reason": "rollout aborted"}
+22:55:04   operator-revert-commit 
+22:55:38   trial-end 
+22:55:38 trial T084: MTTR_full=139.6s MTTR_service=0.0s trigger=deadline latency=90.4s valid=True
+22:55:38 trial T085: canary / bad-image-after-abort / auto
+22:55:39 reset: deleting old ReplicaSet mttr-app-5cd78fbcdc
+22:55:45   setup-release 
+22:57:05   setup-revert 
+22:57:10   setup-done {"hash": "79b967bc55", "annotation_kept": true}
+22:57:40   trial-start 
+22:57:40   commit-release {"release": "T085"}
+22:57:45   release-applied {"hash": "66c9dfcc56"}
+22:57:47   fault-confirmed 
+23:02:46   trial-timeout 
+23:02:46 trial T085: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+23:02:46 trial T086: rolling / crashloop / auto
+23:02:46 reset: canary was left on a stuck release
+23:02:46 reset: committing the baseline release to canary/rollout.yaml
+23:02:50 reset: deleting old ReplicaSet mttr-app-66c9dfcc56
+23:02:50 reset: deleting old ReplicaSet mttr-app-79b967bc55
+23:03:29   trial-start 
+23:03:29   commit-release {"release": "T086"}
+23:03:35   chaos-created {"TARGET_HASH": "5bc4c5b566"}
+23:03:46   fault-confirmed 
+23:04:05   operator-sees-failure {"reason": "rollout aborted"}
+23:04:50   operator-revert-commit 
+23:05:25   trial-end 
+23:05:25 trial T086: MTTR_full=69.9s MTTR_service=10.8s trigger=analysis latency=19.9s valid=True
+23:05:25 trial T087: bluegreen / faulty-release / auto
+23:05:26 reset: deleting old ReplicaSet mttr-app-8556874cbf
+23:06:03   trial-start 
+23:06:03   commit-release {"release": "T087"}
+23:06:08   release-applied {"hash": "55d79677cc"}
+23:06:55   operator-sees-failure {"reason": "rollout aborted"}
+23:07:40   operator-revert-commit 
+23:08:15   trial-end 
+23:08:16 trial T087: MTTR_full=97.4s MTTR_service=0.0s trigger=analysis latency=46.8s valid=True
+23:08:16 trial T088: rolling / bad-image / auto
+23:08:16 reset: deleting old ReplicaSet mttr-app-5bc4c5b566
+23:08:53   trial-start 
+23:08:53   commit-release {"release": "T088"}
+23:08:58   release-applied {"hash": "f9f997547"}
+23:09:00   fault-confirmed 
+23:10:29   operator-sees-failure {"reason": "rollout aborted"}
+23:11:14   operator-revert-commit 
+23:11:48   trial-end 
+23:11:48 trial T088: MTTR_full=139.4s MTTR_service=0.0s trigger=deadline latency=90.5s valid=True
+23:11:48 trial T089: canary / faulty-release / auto
+23:12:25   trial-start 
+23:12:25   commit-release {"release": "T089"}
+23:12:29   release-applied {"hash": "7dd48df767"}
+23:13:30   operator-sees-failure {"reason": "rollout aborted"}
+23:14:15   webhooks-disabled 
+23:14:15   operator-revert-commit 
+23:16:57   trial-end 
+23:16:57 trial T089: MTTR_full=237.7s MTTR_service=64.0s trigger=analysis latency=61.1s valid=True
+23:16:57 trial T090: bluegreen / bad-image / auto
+23:16:58 reset: deleting old ReplicaSet mttr-app-55d79677cc
+23:17:34   trial-start 
+23:17:34   commit-release {"release": "T090"}
+23:17:40   release-applied {"hash": "6d5965854b"}
+23:17:42   fault-confirmed 
+23:19:11   operator-sees-failure {"reason": "rollout aborted"}
+23:19:56   operator-revert-commit 
+23:20:32   trial-end 
+23:20:32 trial T090: MTTR_full=141.6s MTTR_service=0.0s trigger=deadline latency=90.8s valid=True
+23:20:32 trial T091: canary / cp-rollouts-prometheus-healthy-long / auto
+23:20:33 reset: deleting old ReplicaSet mttr-app-7dd48df767
+23:21:09   trial-start 
+23:21:09   commit-release {"release": "T091"}
+23:21:16   chaos-created {"TARGET_HASH": "7f694ffb9d"}
+23:21:16   fault-confirmed 
+23:26:16   chaos-stopped 
+23:26:46   trial-end 
+23:26:46 trial T091: MTTR_full=181.1s MTTR_service=0.0s trigger=none latency=nans valid=True
+23:26:46 trial T092: canary / config-drift / auto
+23:26:47 reset: committing the baseline release to canary/rollout.yaml
+23:26:48 reset: deleting old ReplicaSet mttr-app-6c94459d65
+23:30:23 reset: deleting old ReplicaSet mttr-app-7f694ffb9d
+23:30:59   trial-start 
+23:31:00   live-patched 
+23:32:01   trial-end 
+23:32:01 trial T092: MTTR_full=1.8s MTTR_service=0.0s trigger=none latency=nans valid=True
+23:32:01 trial T093: rolling / faulty-release / auto
+23:32:02 reset: deleting old ReplicaSet mttr-app-f9f997547
+23:32:37   trial-start 
+23:32:38   commit-release {"release": "T093"}
+23:32:43   release-applied {"hash": "7bc6f66988"}
+23:33:29   operator-sees-failure {"reason": "rollout aborted"}
+23:34:14   operator-revert-commit 
+23:34:50   trial-end 
+23:34:50 trial T093: MTTR_full=97.0s MTTR_service=48.6s trigger=analysis latency=45.7s valid=True
+23:34:50 trial T094: canary / control-stable-partition / auto
+23:34:51 reset: deleting old ReplicaSet mttr-app-8556874cbf
+23:35:27   trial-start 
+23:35:28   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-g68vp"}
+23:35:29   fault-confirmed 
+23:36:59   trial-end 
+23:36:59 trial T094: MTTR_full=58.6s MTTR_service=58.6s trigger=none latency=nans valid=True
+23:36:59 trial T095: bluegreen / config-drift / auto
+23:37:00 reset: deleting old ReplicaSet mttr-app-6d5965854b
+23:37:36   trial-start 
+23:37:37   live-patched 
+23:38:38   trial-end 
+23:38:38 trial T095: MTTR_full=1.7s MTTR_service=0.0s trigger=none latency=nans valid=True
+23:38:38 trial T096: bluegreen / cp-rollouts-prometheus-faulty / auto
+23:38:39 reset: deleting old ReplicaSet mttr-app-8556874cbf
+23:39:15   trial-start 
+23:39:15   commit-release {"release": "T096"}
+23:39:23   chaos-created {"TARGET_HASH": "c59dddb55"}
+23:39:24   fault-confirmed 
+23:40:52   operator-sees-failure {"reason": "rollout aborted"}
+23:41:23   chaos-stopped 
+23:41:37   operator-revert-commit 
+23:42:13   trial-end 
+23:42:13 trial T096: MTTR_full=139.4s MTTR_service=0.0s trigger=deadline latency=88.3s valid=True
+23:42:13 trial T097: canary / faulty-release / auto
+23:42:50   trial-start 
+23:42:50   commit-release {"release": "T097"}
+23:42:56   release-applied {"hash": "8cd7cfdd8"}
+23:43:42   operator-sees-failure {"reason": "rollout aborted"}
+23:44:27   operator-revert-commit 
+23:45:03   trial-end 
+23:45:03 trial T097: MTTR_full=97.3s MTTR_service=43.9s trigger=analysis latency=46.0s valid=True
+23:45:03 trial T098: bluegreen / config-drift / manual
+23:45:04 reset: deleting old ReplicaSet mttr-app-c59dddb55
+23:45:45   trial-start 
+23:45:45   live-patched 
+23:45:45   operator-sees-outofsync 
+23:46:30   operator-sync 
+23:47:32   trial-end 
+23:47:32 trial T098: MTTR_full=47.3s MTTR_service=0.0s trigger=analysis latency=46.8s valid=True
+23:47:32 trial T099: canary / cp-rollouts-prometheus-faulty / auto
+23:47:33 reset: deleting old ReplicaSet mttr-app-8cd7cfdd8
+23:48:09   trial-start 
+23:48:09   commit-release {"release": "T099"}
+23:48:15   chaos-created {"TARGET_HASH": "864dd8c78b"}
+23:48:17   fault-confirmed 
+23:50:16   chaos-stopped 
+23:50:45   operator-sees-failure {"reason": "rollout aborted"}
+23:51:30   operator-revert-commit 
+23:52:05   trial-end 
+23:52:06 trial T099: MTTR_full=199.2s MTTR_service=148.4s trigger=analysis latency=148.5s valid=True
+23:52:06 trial T100: rolling / config-drift / manual
+23:52:06 reset: deleting old ReplicaSet mttr-app-7bc6f66988
+23:52:43   trial-start 
+23:52:43   live-patched 
+23:52:43   operator-sees-outofsync 
+23:53:28   operator-sync 
+23:54:05   trial-end 
+23:54:05 trial T100: MTTR_full=49.5s MTTR_service=49.5s trigger=analysis latency=45.6s valid=True
+23:54:05 trial T101: rolling / cp-rollouts-prometheus-faulty-long / auto
+23:54:06 reset: deleting old ReplicaSet mttr-app-8556874cbf
+23:54:42   trial-start 
+23:54:42   commit-release {"release": "T101"}
+23:54:48   chaos-created {"TARGET_HASH": "7cdb8fd86d"}
+23:54:49   fault-confirmed 
+23:57:52   operator-sees-failure {"reason": "SLO alert"}
+23:58:37   operator-revert-commit 
+23:59:48   chaos-stopped 
+00:02:21   trial-end 
+00:02:21 trial T101: MTTR_full=420.2s MTTR_service=420.2s trigger=none latency=nans valid=True
+00:02:21 trial T102: bluegreen / crashloop / auto
+00:02:22 reset: deleting old ReplicaSet mttr-app-8556874cbf
+00:02:59   trial-start 
+00:02:59   commit-release {"release": "T102"}
+00:03:07   chaos-created {"TARGET_HASH": "66d857d84f"}
+00:03:17   fault-confirmed 
+00:03:37   operator-sees-failure {"reason": "rollout aborted"}
+00:04:22   operator-revert-commit 
+00:04:59   trial-end 
+00:04:59 trial T102: MTTR_full=71.7s MTTR_service=0.0s trigger=analysis latency=19.9s valid=True
+00:04:59 trial T103: bluegreen / bad-image-after-abort / auto
+00:05:00 reset: deleting old ReplicaSet mttr-app-66d857d84f
+00:05:06   setup-release 
+00:06:28   setup-revert 
+00:06:33   setup-done {"hash": "68dc68cb74", "annotation_kept": true}
+00:07:03   trial-start 
+00:07:03   commit-release {"release": "T103"}
+00:07:08   release-applied {"hash": "75bb5f8c5c"}
+00:07:10   fault-confirmed 
+00:12:08   trial-timeout 
+00:12:08 trial T103: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+00:12:08 trial T104: canary / faulty-release / manual
+00:12:08 reset: bluegreen was left on a stuck release
+00:12:09 reset: committing the baseline release to bluegreen/rollout.yaml
+00:12:14 reset: deleting old ReplicaSet mttr-app-68dc68cb74
+00:12:43 reset: deleting old ReplicaSet mttr-app-75bb5f8c5c
+00:12:44 reset: deleting old ReplicaSet mttr-app-864dd8c78b
+00:13:20   trial-start 
+00:13:20   commit-release {"release": "T104"}
+00:13:25   deploy-sync 
+00:13:26   release-applied {"hash": "6c97985987"}
+00:13:26   operator-sees-outofsync 
+00:14:27   operator-sees-failure {"reason": "rollout aborted"}
+00:15:12   operator-revert-commit 
+00:15:16   operator-sees-outofsync 
+00:16:01   operator-sync 
+00:16:33   trial-end 
+00:16:33 trial T104: MTTR_full=156.7s MTTR_service=61.4s trigger=analysis latency=60.5s valid=False
+00:16:33 trial T105: canary / control-stable-crash / auto
+00:16:34 reset: deleting old ReplicaSet mttr-app-6c97985987
+00:17:11   trial-start 
+00:17:11   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-g68vp"}
+00:17:21   fault-confirmed 
+00:18:11   chaos-stopped 
+00:18:42   trial-end 
+00:18:42 trial T105: MTTR_full=51.1s MTTR_service=12.8s trigger=none latency=nans valid=True
+00:18:42 trial T106: canary / cp-argocd-gitea-revert / auto
+00:18:43 reset: replacing restarted pod mttr-app-6c94459d65-g68vp
+00:19:21   trial-start 
+00:19:21   commit-release {"release": "T106"}
+00:19:27   release-applied {"hash": "649944bd77"}
+00:20:13   operator-sees-failure {"reason": "rollout aborted"}
+00:20:58   revert-chaos-created {"manifests": [["NetworkChaos", "repo-server-gitea-t106"]]}
+00:20:58   operator-revert-commit 
+00:22:58   revert-chaos-stopped 
+00:25:55   trial-end 
+00:25:56 trial T106: MTTR_full=358.5s MTTR_service=46.9s trigger=analysis latency=46.0s valid=True
+00:25:56 trial T107: rolling / config-drift / manual
+00:25:57 reset: deleting old ReplicaSet mttr-app-7cdb8fd86d
+00:26:32   trial-start 
+00:26:33   live-patched 
+00:26:33   operator-sees-outofsync 
+00:27:18   operator-sync 
+00:27:20   operator-sees-outofsync 
+00:27:55   trial-end 
+00:27:55 trial T107: MTTR_full=50.0s MTTR_service=50.0s trigger=none latency=nans valid=True
+00:27:55 trial T108: canary / cp-rollouts-prometheus-faulty-long / auto
+00:27:56 reset: deleting old ReplicaSet mttr-app-649944bd77
+00:28:32   trial-start 
+00:28:32   commit-release {"release": "T108"}
+00:28:39   chaos-created {"TARGET_HASH": "66f4856fc5"}
+00:28:39   fault-confirmed 
+00:31:40   operator-sees-failure {"reason": "SLO alert"}
+00:32:25   operator-revert-commit 
+00:33:39   chaos-stopped 
+00:36:34   trial-end 
+00:36:34 trial T108: MTTR_full=417.6s MTTR_service=417.6s trigger=none latency=nans valid=True
+00:36:34 trial T109: canary / network-partition / auto
+00:36:35 reset: deleting old ReplicaSet mttr-app-66f4856fc5
+00:37:11   trial-start 
+00:37:11   commit-release {"release": "T109"}
+00:37:19   chaos-created {"TARGET_HASH": "9c887668"}
+00:37:20   fault-confirmed 
+00:38:04   operator-sees-failure {"reason": "rollout aborted"}
+00:38:49   operator-revert-commit 
+00:39:25   trial-end 
+00:39:25 trial T109: MTTR_full=95.6s MTTR_service=45.2s trigger=analysis latency=44.3s valid=True
+00:39:25 trial T110: rolling / config-drift / auto
+00:39:26 reset: deleting old ReplicaSet mttr-app-8556874cbf
+00:40:01   trial-start 
+00:40:01   live-patched 
+00:40:38   trial-end 
+00:40:38 trial T110: MTTR_full=4.1s MTTR_service=4.1s trigger=none latency=nans valid=True
+00:40:38 trial T111: canary / bad-image-after-abort / auto
+00:40:39 reset: deleting old ReplicaSet mttr-app-9c887668
+00:40:45   setup-release 
+00:42:06   setup-revert 
+00:42:11   setup-done {"hash": "7497799669", "annotation_kept": true}
+00:42:41   trial-start 
+00:42:41   commit-release {"release": "T111"}
+00:42:47   release-applied {"hash": "6d9865d666"}
+00:42:48   fault-confirmed 
+00:47:47   trial-timeout 
+00:47:47 trial T111: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+00:47:47 trial T112: bluegreen / cp-rollouts-prometheus-faulty / auto
+00:47:47 reset: canary was left on a stuck release
+00:47:48 reset: committing the baseline release to canary/rollout.yaml
+00:47:51 reset: deleting old ReplicaSet mttr-app-6d9865d666
+00:47:51 reset: deleting old ReplicaSet mttr-app-7497799669
+00:48:30   trial-start 
+00:48:30   commit-release {"release": "T112"}
+00:48:37   chaos-created {"TARGET_HASH": "68496b9b56"}
+00:48:37   fault-confirmed 
+00:50:06   operator-sees-failure {"reason": "rollout aborted"}
+00:50:37   chaos-stopped 
+00:50:51   operator-revert-commit 
+00:51:26   trial-end 
+00:51:26 trial T112: MTTR_full=139.1s MTTR_service=0.0s trigger=deadline latency=88.6s valid=True
+00:51:26 trial T113: bluegreen / network-partition / auto
+00:51:27 reset: deleting old ReplicaSet mttr-app-68496b9b56
+00:52:03   trial-start 
+00:52:03   commit-release {"release": "T113"}
+00:52:11   chaos-created {"TARGET_HASH": "886f8bf75"}
+00:52:13   fault-confirmed 
+00:52:56   operator-sees-failure {"reason": "rollout aborted"}
+00:53:41   operator-revert-commit 
+00:54:17   trial-end 
+00:54:17 trial T113: MTTR_full=95.3s MTTR_service=0.0s trigger=analysis latency=44.5s valid=True
+00:54:17 trial T114: rolling / cp-rollouts-prometheus-faulty / auto
+00:54:18 reset: deleting old ReplicaSet mttr-app-8556874cbf
+00:54:54   trial-start 
+00:54:54   commit-release {"release": "T114"}
+00:55:01   chaos-created {"TARGET_HASH": "6fb7bd886"}
+00:55:02   fault-confirmed 
+00:57:01   chaos-stopped 
+00:57:30   operator-sees-failure {"reason": "rollout aborted"}
+00:58:15   operator-revert-commit 
+00:58:51   trial-end 
+00:58:51 trial T114: MTTR_full=199.2s MTTR_service=154.2s trigger=analysis latency=148.2s valid=True
+00:58:51 trial T115: rolling / crashloop / auto
+00:58:52 reset: deleting old ReplicaSet mttr-app-6fb7bd886
+00:59:28   trial-start 
+00:59:28   commit-release {"release": "T115"}
+00:59:35   chaos-created {"TARGET_HASH": "5645d864cc"}
+00:59:46   fault-confirmed 
+01:00:05   operator-sees-failure {"reason": "rollout aborted"}
+01:00:50   operator-revert-commit 
+01:01:25   trial-end 
+01:01:25 trial T115: MTTR_full=70.1s MTTR_service=11.7s trigger=analysis latency=19.8s valid=True
+01:01:25 trial T116: bluegreen / bad-image / auto
+01:01:26 reset: deleting old ReplicaSet mttr-app-886f8bf75
+01:02:03   trial-start 
+01:02:03   commit-release {"release": "T116"}
+01:02:08   release-applied {"hash": "65896759d7"}
+01:02:10   fault-confirmed 
+01:03:39   operator-sees-failure {"reason": "rollout aborted"}
+01:04:24   operator-revert-commit 
+01:05:00   trial-end 
+01:05:00 trial T116: MTTR_full=141.6s MTTR_service=0.0s trigger=deadline latency=90.5s valid=True
+01:05:00 trial T117: bluegreen / crashloop / auto
+01:05:01 reset: deleting old ReplicaSet mttr-app-65896759d7
+01:05:38   trial-start 
+01:05:38   commit-release {"release": "T117"}
+01:05:45   chaos-created {"TARGET_HASH": "5745568d99"}
+01:05:55   fault-confirmed 
+01:06:00   operator-sees-failure {"reason": "rollout aborted"}
+01:06:45   operator-revert-commit 
+01:07:20   trial-end 
+01:07:20 trial T117: MTTR_full=54.8s MTTR_service=0.0s trigger=analysis latency=4.7s valid=True
+01:07:20 trial T118: rolling / faulty-release / auto
+01:07:21 reset: deleting old ReplicaSet mttr-app-5645d864cc
+01:07:57   trial-start 
+01:07:57   commit-release {"release": "T118"}
+01:08:03   release-applied {"hash": "65df8dfffd"}
+01:08:49   operator-sees-failure {"reason": "rollout aborted"}
+01:09:34   operator-revert-commit 
+01:10:10   trial-end 
+01:10:10 trial T118: MTTR_full=97.1s MTTR_service=48.9s trigger=analysis latency=45.9s valid=True
+01:10:10 trial T119: canary / crashloop / auto
+01:10:47   trial-start 
+01:10:47   commit-release {"release": "T119"}
+01:10:55   chaos-created {"TARGET_HASH": "56774d797c"}
+01:11:04   fault-confirmed 
+01:11:24   operator-sees-failure {"reason": "rollout aborted"}
+01:12:09   operator-revert-commit 
+01:12:45   trial-end 
+01:12:45 trial T119: MTTR_full=71.0s MTTR_service=12.8s trigger=analysis latency=20.0s valid=True
+01:12:45 trial T120: canary / cp-rollouts-prometheus-healthy-long / auto
+01:12:46 reset: deleting old ReplicaSet mttr-app-56774d797c
+01:13:23   trial-start 
+01:13:23   commit-release {"release": "T120"}
+01:13:29   chaos-created {"TARGET_HASH": "59485c6765"}
+01:13:30   fault-confirmed 
+01:18:29   chaos-stopped 
+01:18:59   trial-end 
+01:19:00 trial T120: MTTR_full=182.1s MTTR_service=0.0s trigger=none latency=nans valid=True
+01:19:00 trial T121: canary / config-drift / manual
+01:19:00 reset: committing the baseline release to canary/rollout.yaml
+01:19:01 reset: deleting old ReplicaSet mttr-app-6c94459d65
+01:22:37 reset: deleting old ReplicaSet mttr-app-59485c6765
+01:23:13   trial-start 
+01:23:13   live-patched 
+01:23:13   operator-sees-outofsync 
+01:23:58   operator-sync 
+01:25:00   trial-end 
+01:25:00 trial T121: MTTR_full=47.3s MTTR_service=43.6s trigger=none latency=nans valid=True
+01:25:00 trial T122: canary / faulty-release / auto
+01:25:01 reset: deleting old ReplicaSet mttr-app-8556874cbf
+01:25:36   trial-start 
+01:25:36   commit-release {"release": "T122"}
+01:25:42   release-applied {"hash": "57558c48c9"}
+01:26:29   operator-sees-failure {"reason": "rollout aborted"}
+01:27:14   webhooks-disabled 
+01:27:14   operator-revert-commit 
+01:31:55   trial-end 
+01:31:56 trial T122: MTTR_full=342.7s MTTR_service=47.2s trigger=analysis latency=46.3s valid=True
+01:31:56 trial T123: rolling / cp-rollouts-prometheus-faulty-long / auto
+01:31:56 reset: deleting old ReplicaSet mttr-app-65df8dfffd
+01:32:33   trial-start 
+01:32:33   commit-release {"release": "T123"}
+01:32:39   chaos-created {"TARGET_HASH": "646d85fcfb"}
+01:32:39   fault-confirmed 
+01:35:42   operator-sees-failure {"reason": "SLO alert"}
+01:36:27   operator-revert-commit 
+01:37:39   chaos-stopped 
+01:40:09   trial-end 
+01:40:09 trial T123: MTTR_full=417.5s MTTR_service=417.5s trigger=none latency=nans valid=True
+01:40:09 trial T124: canary / config-drift / auto
+01:40:10 reset: deleting old ReplicaSet mttr-app-57558c48c9
+01:40:47   trial-start 
+01:40:47   live-patched 
+01:41:48   trial-end 
+01:41:48 trial T124: MTTR_full=1.5s MTTR_service=0.0s trigger=none latency=nans valid=True
+01:41:48 trial T125: canary / control-stable-partition / auto
+01:41:49 reset: deleting old ReplicaSet mttr-app-8556874cbf
+01:42:25   trial-start 
+01:42:25   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-4xssf"}
+01:42:26   fault-confirmed 
+01:43:57   trial-end 
+01:43:57 trial T125: MTTR_full=59.5s MTTR_service=59.5s trigger=none latency=nans valid=True
+01:43:57 trial T126: canary / cp-rollouts-prometheus-faulty / auto
+01:44:34   trial-start 
+01:44:34   commit-release {"release": "T126"}
+01:44:39   chaos-created {"TARGET_HASH": "658b78b99"}
+01:44:40   fault-confirmed 
+01:46:39   chaos-stopped 
+01:47:09   operator-sees-failure {"reason": "rollout aborted"}
+01:47:54   operator-revert-commit 
+01:48:28   trial-end 
+01:48:28 trial T126: MTTR_full=198.1s MTTR_service=149.0s trigger=analysis latency=149.1s valid=True
+01:48:28 trial T127: bluegreen / cp-rollouts-prometheus-faulty-long / auto
+01:48:29 reset: deleting old ReplicaSet mttr-app-5745568d99
+01:49:06   trial-start 
+01:49:06   commit-release {"release": "T127"}
+01:49:13   chaos-created {"TARGET_HASH": "859d568d68"}
+01:49:14   fault-confirmed 
+01:50:42   operator-sees-failure {"reason": "rollout aborted"}
+01:51:27   operator-revert-commit 
+01:54:13   chaos-stopped 
+01:54:43   trial-end 
+01:54:43 trial T127: MTTR_full=138.8s MTTR_service=0.0s trigger=deadline latency=88.4s valid=True
+01:54:43 trial T128: rolling / network-partition / auto
+01:54:44 reset: deleting old ReplicaSet mttr-app-646d85fcfb
+01:55:21   trial-start 
+01:55:21   commit-release {"release": "T128"}
+01:55:26   chaos-created {"TARGET_HASH": "6847b5c7c"}
+01:55:27   fault-confirmed 
+01:56:11   operator-sees-failure {"reason": "rollout aborted"}
+01:56:56   operator-revert-commit 
+01:57:30   trial-end 
+01:57:30 trial T128: MTTR_full=93.4s MTTR_service=47.9s trigger=analysis latency=44.0s valid=True
+01:57:30 trial T129: rolling / bad-image-after-abort / auto
+01:57:31 reset: deleting old ReplicaSet mttr-app-6847b5c7c
+01:57:37   setup-release 
+01:58:28   setup-revert 
+01:58:32   setup-done {"hash": "76f7b49674", "annotation_kept": false}
+01:59:02   trial-start 
+01:59:03   commit-release {"release": "T129"}
+01:59:08   release-applied {"hash": "6874c9b77"}
+01:59:09   fault-confirmed 
+02:00:39   operator-sees-failure {"reason": "rollout aborted"}
+02:01:24   operator-revert-commit 
+02:01:59   trial-end 
+02:01:59 trial T129: MTTR_full=141.5s MTTR_service=0.0s trigger=deadline latency=91.2s valid=False
+02:01:59 trial T130: bluegreen / faulty-release / auto
+02:02:00 reset: deleting old ReplicaSet mttr-app-859d568d68
+02:02:37   trial-start 
+02:02:37   commit-release {"release": "T130"}
+02:02:40   release-applied {"hash": "7df4cf8668"}
+02:03:27   operator-sees-failure {"reason": "rollout aborted"}
+02:04:12   operator-revert-commit 
+02:04:46   trial-end 
+02:04:46 trial T130: MTTR_full=95.8s MTTR_service=0.0s trigger=analysis latency=46.9s valid=True
+02:04:46 trial T131: canary / cp-rollouts-prometheus-healthy / auto
+02:04:47 reset: deleting old ReplicaSet mttr-app-658b78b99
+02:05:22   trial-start 
+02:05:22   commit-release {"release": "T131"}
+02:05:28   chaos-created {"TARGET_HASH": "867c4df7bc"}
+02:05:29   fault-confirmed 
+02:07:28   chaos-stopped 
+02:08:34   operator-sees-failure {"reason": "SLO alert"}
+02:09:19   operator-revert-commit 
+02:13:26   trial-end 
+02:13:26 trial T131: MTTR_full=417.5s MTTR_service=0.0s trigger=none latency=nans valid=True
+02:13:26 trial T132: bluegreen / config-drift / auto
+02:13:27 reset: deleting old ReplicaSet mttr-app-7df4cf8668
+02:14:03   trial-start 
+02:14:04   live-patched 
+02:15:05   trial-end 
+02:15:05 trial T132: MTTR_full=1.6s MTTR_service=0.0s trigger=none latency=nans valid=True
+02:15:05 trial T133: canary / faulty-release / auto
+02:15:06 reset: deleting old ReplicaSet mttr-app-867c4df7bc
+02:15:41   trial-start 
+02:15:42   commit-release {"release": "T133"}
+02:15:45   release-applied {"hash": "d9db97bb9"}
+02:16:46   operator-sees-failure {"reason": "rollout aborted"}
+02:17:31   operator-revert-commit 
+02:18:06   trial-end 
+02:18:06 trial T133: MTTR_full=111.2s MTTR_service=60.8s trigger=analysis latency=61.0s valid=True
+02:18:06 trial T134: canary / bad-image / auto
+02:18:07 reset: deleting old ReplicaSet mttr-app-d9db97bb9
+02:18:43   trial-start 
+02:18:43   commit-release {"release": "T134"}
+02:18:47   release-applied {"hash": "7cc75f8755"}
+02:18:49   fault-confirmed 
+02:20:18   operator-sees-failure {"reason": "rollout aborted"}
+02:21:03   operator-revert-commit 
+02:21:37   trial-end 
+02:21:37 trial T134: MTTR_full=139.2s MTTR_service=0.0s trigger=deadline latency=90.4s valid=True
+02:21:37 trial T135: bluegreen / config-drift / manual
+02:21:38 reset: deleting old ReplicaSet mttr-app-8556874cbf
+02:22:14   trial-start 
+02:22:15   live-patched 
+02:22:15   operator-sees-outofsync 
+02:23:00   operator-sync 
+02:24:02   trial-end 
+02:24:02 trial T135: MTTR_full=47.5s MTTR_service=0.0s trigger=analysis latency=47.1s valid=True
+02:24:02 trial T136: rolling / bad-image / auto
+02:24:03 reset: deleting old ReplicaSet mttr-app-6874c9b77
+02:24:03 reset: deleting old ReplicaSet mttr-app-76f7b49674
+02:24:39   trial-start 
+02:24:39   commit-release {"release": "T136"}
+02:24:44   release-applied {"hash": "7cd577d6d9"}
+02:24:45   fault-confirmed 
+02:26:15   operator-sees-failure {"reason": "rollout aborted"}
+02:27:00   operator-revert-commit 
+02:27:35   trial-end 
+02:27:35 trial T136: MTTR_full=141.1s MTTR_service=0.0s trigger=deadline latency=91.0s valid=True
+02:27:35 trial T137: canary / faulty-release / auto
+02:27:36 reset: deleting old ReplicaSet mttr-app-7cc75f8755
+02:28:11   trial-start 
+02:28:11   commit-release {"release": "T137"}
+02:28:16   release-applied {"hash": "6858c4574f"}
+02:29:17   operator-sees-failure {"reason": "rollout aborted"}
+02:30:02   operator-revert-commit 
+02:30:37   trial-end 
+02:30:38 trial T137: MTTR_full=111.1s MTTR_service=62.5s trigger=analysis latency=60.6s valid=True
+02:30:38 trial T138: canary / cp-rollouts-prometheus-faulty-long / auto
+02:30:38 reset: deleting old ReplicaSet mttr-app-6858c4574f
+02:31:15   trial-start 
+02:31:15   commit-release {"release": "T138"}
+02:31:22   chaos-created {"TARGET_HASH": "9d6dcfd8d"}
+02:31:23   fault-confirmed 
+02:34:23   operator-sees-failure {"reason": "SLO alert"}
+02:35:08   operator-revert-commit 
+02:36:22   chaos-stopped 
+02:39:16   trial-end 
+02:39:16 trial T138: MTTR_full=415.4s MTTR_service=415.4s trigger=none latency=nans valid=True
+02:39:16 trial T139: canary / faulty-release / auto
+02:39:17 reset: deleting old ReplicaSet mttr-app-9d6dcfd8d
+02:39:54   trial-start 
+02:39:54   commit-release {"release": "T139"}
+02:39:59   release-applied {"hash": "77cfc55467"}
+02:40:45   operator-sees-failure {"reason": "rollout aborted"}
+02:41:30   webhooks-disabled 
+02:41:30   operator-revert-commit 
+02:43:56   trial-end 
+02:43:56 trial T139: MTTR_full=207.0s MTTR_service=44.9s trigger=analysis latency=46.0s valid=True
+02:43:56 trial T140: canary / bad-image / auto
+02:43:57 reset: deleting old ReplicaSet mttr-app-77cfc55467
+02:44:33   trial-start 
+02:44:33   commit-release {"release": "T140"}
+02:44:38   release-applied {"hash": "69675c7f96"}
+02:44:40   fault-confirmed 
+02:46:09   operator-sees-failure {"reason": "rollout aborted"}
+02:46:54   operator-revert-commit 
+02:47:29   trial-end 
+02:47:30 trial T140: MTTR_full=141.3s MTTR_service=0.0s trigger=deadline latency=90.7s valid=True
+02:47:30 trial T141: canary / config-drift / auto
+02:47:30 reset: deleting old ReplicaSet mttr-app-69675c7f96
+02:48:07   trial-start 
+02:48:07   live-patched 
+02:49:09   trial-end 
+02:49:09 trial T141: MTTR_full=1.7s MTTR_service=0.0s trigger=none latency=nans valid=True
+02:49:09 trial T142: canary / bad-image-after-abort / auto
+02:49:10 reset: deleting old ReplicaSet mttr-app-8556874cbf
+02:49:16   setup-release 
+02:50:36   setup-revert 
+02:50:42   setup-done {"hash": "7456667c7", "annotation_kept": true}
+02:51:12   trial-start 
+02:51:12   commit-release {"release": "T142"}
+02:51:17   release-applied {"hash": "5b8849b498"}
+02:51:18   fault-confirmed 
+02:56:17   trial-timeout 
+02:56:18 trial T142: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+02:56:18 trial T143: bluegreen / cp-rollouts-prometheus-faulty-long / auto
+02:56:18 reset: canary was left on a stuck release
+02:56:18 reset: committing the baseline release to canary/rollout.yaml
+02:56:21 reset: deleting old ReplicaSet mttr-app-5b8849b498
+02:56:21 reset: deleting old ReplicaSet mttr-app-7456667c7
+02:56:22 reset: deleting old ReplicaSet mttr-app-8556874cbf
+02:57:00   trial-start 
+02:57:01   commit-release {"release": "T143"}
+02:57:08   chaos-created {"TARGET_HASH": "5645d8b58b"}
+02:57:08   fault-confirmed 
+02:58:36   operator-sees-failure {"reason": "rollout aborted"}
+02:59:21   operator-revert-commit 
+03:02:08   chaos-stopped 
+03:02:38   trial-end 
+03:02:38 trial T143: MTTR_full=138.7s MTTR_service=0.0s trigger=deadline latency=87.7s valid=True
+03:02:38 trial T144: bluegreen / crashloop / auto
+03:02:39 reset: deleting old ReplicaSet mttr-app-5645d8b58b
+03:03:16   trial-start 
+03:03:16   commit-release {"release": "T144"}
+03:03:24   chaos-created {"TARGET_HASH": "6884b7fdff"}
+03:03:34   fault-confirmed 
+03:03:54   operator-sees-failure {"reason": "rollout aborted"}
+03:04:39   operator-revert-commit 
+03:05:15   trial-end 
+03:05:16 trial T144: MTTR_full=71.2s MTTR_service=0.0s trigger=analysis latency=19.8s valid=True
+03:05:16 trial T145: canary / control-stable-partition / auto
+03:05:52   trial-start 
+03:05:52   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-skqwq"}
+03:05:53   fault-confirmed 
+03:07:24   trial-end 
+03:07:24 trial T145: MTTR_full=59.0s MTTR_service=59.0s trigger=none latency=nans valid=True
+03:07:24 trial T146: bluegreen / config-drift / auto
+03:07:25 reset: deleting old ReplicaSet mttr-app-6884b7fdff
+03:08:01   trial-start 
+03:08:02   live-patched 
+03:09:03   trial-end 
+03:09:03 trial T146: MTTR_full=1.7s MTTR_service=0.0s trigger=none latency=nans valid=True
+03:09:03 trial T147: canary / cp-rollouts-prometheus-faulty / auto
+03:09:40   trial-start 
+03:09:40   commit-release {"release": "T147"}
+03:09:46   chaos-created {"TARGET_HASH": "66889c499d"}
+03:09:46   fault-confirmed 
+03:11:46   chaos-stopped 
+03:12:15   operator-sees-failure {"reason": "rollout aborted"}
+03:13:00   operator-revert-commit 
+03:13:36   trial-end 
+03:13:36 trial T147: MTTR_full=199.5s MTTR_service=149.6s trigger=analysis latency=148.7s valid=True
+03:13:36 trial T148: canary / faulty-release / manual
+03:13:37 reset: deleting old ReplicaSet mttr-app-66889c499d
+03:14:13   trial-start 
+03:14:13   commit-release {"release": "T148"}
+03:14:17   deploy-sync 
+03:14:19   release-applied {"hash": "86dc689bc5"}
+03:15:20   operator-sees-failure {"reason": "rollout aborted"}
+03:16:05   operator-revert-commit 
+03:16:08   operator-sees-outofsync 
+03:16:53   operator-sync 
+03:16:55   operator-sees-outofsync 
+03:17:25   trial-end 
+03:17:25 trial T148: MTTR_full=156.5s MTTR_service=60.0s trigger=analysis latency=61.1s valid=True
+03:17:25 trial T149: rolling / cp-rollouts-prometheus-faulty-long / auto
+03:17:26 reset: deleting old ReplicaSet mttr-app-7cd577d6d9
+03:18:03   trial-start 
+03:18:03   commit-release {"release": "T149"}
+03:18:10   chaos-created {"TARGET_HASH": "9fcc6bb9b"}
+03:18:11   fault-confirmed 
+03:21:14   operator-sees-failure {"reason": "SLO alert"}
+03:21:59   operator-revert-commit 
+03:23:10   chaos-stopped 
+03:25:43   trial-end 
+03:25:43 trial T149: MTTR_full=420.0s MTTR_service=420.0s trigger=none latency=nans valid=True
+03:25:43 trial T150: rolling / bad-image-after-abort / auto
+03:25:44 reset: deleting old ReplicaSet mttr-app-9fcc6bb9b
+03:25:50   setup-release 
+03:26:42   setup-revert 
+03:26:47   setup-done {"hash": "5c9bbbc8fd", "annotation_kept": false}
+03:27:17   trial-start 
+03:27:17   commit-release {"release": "T150"}
+03:27:21   release-applied {"hash": "6b5cc49849"}
+03:27:23   fault-confirmed 
+03:28:53   operator-sees-failure {"reason": "rollout aborted"}
+03:29:38   operator-revert-commit 
+03:30:13   trial-end 
+03:30:13 trial T150: MTTR_full=141.3s MTTR_service=0.0s trigger=deadline latency=91.1s valid=False
+03:30:13 trial T151: canary / cp-rollouts-prometheus-healthy / auto
+03:30:14 reset: deleting old ReplicaSet mttr-app-86dc689bc5
+03:30:50   trial-start 
+03:30:50   commit-release {"release": "T151"}
+03:30:56   chaos-created {"TARGET_HASH": "df86678cc"}
+03:30:56   fault-confirmed 
+03:32:56   chaos-stopped 
+03:34:57   trial-end 
+03:34:57 trial T151: MTTR_full=181.4s MTTR_service=0.0s trigger=none latency=nans valid=True
+03:34:57 trial T152: rolling / config-drift / auto
+03:34:58 reset: deleting old ReplicaSet mttr-app-5c9bbbc8fd
+03:34:58 reset: deleting old ReplicaSet mttr-app-6b5cc49849
+03:35:34   trial-start 
+03:35:34   live-patched 
+03:36:07   trial-end 
+03:36:07 trial T152: MTTR_full=1.6s MTTR_service=0.0s trigger=none latency=nans valid=True
+03:36:07 trial T153: rolling / crashloop / auto
+03:36:08 reset: deleting old ReplicaSet mttr-app-8556874cbf
+03:36:43   trial-start 
+03:36:43   commit-release {"release": "T153"}
+03:36:51   chaos-created {"TARGET_HASH": "65b5bd7c9f"}
+03:37:02   fault-confirmed 
+03:37:20   operator-sees-failure {"reason": "rollout aborted"}
+03:38:05   operator-revert-commit 
+03:38:40   trial-end 
+03:38:41 trial T153: MTTR_full=69.5s MTTR_service=10.8s trigger=analysis latency=18.9s valid=True
+03:38:41 trial T154: bluegreen / config-drift / manual
+03:38:42 reset: deleting old ReplicaSet mttr-app-8556874cbf
+03:39:18   trial-start 
+03:39:18   live-patched 
+03:39:19   operator-sees-outofsync 
+03:40:04   operator-sync 
+03:40:05   operator-sees-outofsync 
+03:41:05   trial-end 
+03:41:05 trial T154: MTTR_full=47.2s MTTR_service=0.0s trigger=analysis latency=46.3s valid=True
+03:41:05 trial T155: rolling / config-drift / manual
+03:41:06 reset: deleting old ReplicaSet mttr-app-65b5bd7c9f
+03:41:42   trial-start 
+03:41:42   live-patched 
+03:41:42   operator-sees-outofsync 
+03:42:27   operator-sync 
+03:43:05   trial-end 
+03:43:05 trial T155: MTTR_full=49.8s MTTR_service=49.8s trigger=analysis latency=45.8s valid=True
+03:43:05 trial T156: canary / network-partition / auto
+03:43:06 reset: committing the baseline release to canary/rollout.yaml
+03:43:07 reset: deleting old ReplicaSet mttr-app-6c94459d65
+03:46:42 reset: deleting old ReplicaSet mttr-app-df86678cc
+03:47:19   trial-start 
+03:47:19   commit-release {"release": "T156"}
+03:47:26   chaos-created {"TARGET_HASH": "7b84dcc988"}
+03:47:28   fault-confirmed 
+03:48:11   operator-sees-failure {"reason": "rollout aborted"}
+03:48:56   operator-revert-commit 
+03:49:30   trial-end 
+03:49:31 trial T156: MTTR_full=93.4s MTTR_service=43.7s trigger=analysis latency=43.8s valid=True
+03:49:31 trial T157: canary / crashloop / auto
+03:49:31 reset: deleting old ReplicaSet mttr-app-7b84dcc988
+03:50:08   trial-start 
+03:50:08   commit-release {"release": "T157"}
+03:50:15   chaos-created {"TARGET_HASH": "f5474dc59"}
+03:50:26   fault-confirmed 
+03:50:30   operator-sees-failure {"reason": "rollout aborted"}
+03:51:15   operator-revert-commit 
+03:51:51   trial-end 
+03:51:51 trial T157: MTTR_full=55.8s MTTR_service=1.8s trigger=analysis latency=4.9s valid=True
+03:51:51 trial T158: rolling / cp-rollouts-prometheus-faulty / auto
+03:51:52 reset: deleting old ReplicaSet mttr-app-8556874cbf
+03:52:29   trial-start 
+03:52:29   commit-release {"release": "T158"}
+03:52:35   chaos-created {"TARGET_HASH": "7c7695f85d"}
+03:52:36   fault-confirmed 
+03:54:35   chaos-stopped 
+03:55:05   operator-sees-failure {"reason": "rollout aborted"}
+03:55:50   operator-revert-commit 
+03:56:25   trial-end 
+03:56:25 trial T158: MTTR_full=199.4s MTTR_service=154.1s trigger=analysis latency=149.2s valid=True
+03:56:25 trial T159: rolling / network-partition / auto
+03:56:26 reset: deleting old ReplicaSet mttr-app-7c7695f85d
+03:57:02   trial-start 
+03:57:02   commit-release {"release": "T159"}
+03:57:09   chaos-created {"TARGET_HASH": "76448d6f"}
+03:57:10   fault-confirmed 
+03:57:54   operator-sees-failure {"reason": "rollout aborted"}
+03:58:39   operator-revert-commit 
+03:59:13   trial-end 
+03:59:14 trial T159: MTTR_full=93.5s MTTR_service=47.9s trigger=analysis latency=43.9s valid=True
+03:59:14 trial T160: canary / config-drift / manual
+03:59:14 reset: deleting old ReplicaSet mttr-app-f5474dc59
+03:59:50   trial-start 
+03:59:51   live-patched 
+03:59:51   operator-sees-outofsync 
+04:00:36   operator-sync 
+04:01:37   trial-end 
+04:01:37 trial T160: MTTR_full=48.5s MTTR_service=45.9s trigger=analysis latency=46.0s valid=True
+04:01:37 trial T161: bluegreen / faulty-release / auto
+04:01:38 reset: deleting old ReplicaSet mttr-app-8556874cbf
+04:02:14   trial-start 
+04:02:14   commit-release {"release": "T161"}
+04:02:21   release-applied {"hash": "976fc4486"}
+04:03:07   operator-sees-failure {"reason": "rollout aborted"}
+04:03:52   operator-revert-commit 
+04:04:28   trial-end 
+04:04:28 trial T161: MTTR_full=97.4s MTTR_service=0.0s trigger=analysis latency=46.2s valid=True
+04:04:28 trial T162: bluegreen / cp-rollouts-prometheus-faulty / auto
+04:04:29 reset: deleting old ReplicaSet mttr-app-976fc4486
+04:05:05   trial-start 
+04:05:05   commit-release {"release": "T162"}
+04:05:13   chaos-created {"TARGET_HASH": "65b78f7bdc"}
+04:05:14   fault-confirmed 
+04:06:42   operator-sees-failure {"reason": "rollout aborted"}
+04:07:13   chaos-stopped 
+04:07:27   operator-revert-commit 
+04:08:02   trial-end 
+04:08:03 trial T162: MTTR_full=139.0s MTTR_service=0.0s trigger=deadline latency=88.3s valid=True
+04:08:03 trial T163: rolling / faulty-release / auto
+04:08:04 reset: deleting old ReplicaSet mttr-app-76448d6f
+04:08:39   trial-start 
+04:08:39   commit-release {"release": "T163"}
+04:08:45   release-applied {"hash": "74864f88d4"}
+04:09:46   operator-sees-failure {"reason": "rollout aborted"}
+04:10:31   operator-revert-commit 
+04:11:06   trial-end 
+04:11:07 trial T163: MTTR_full=111.1s MTTR_service=62.4s trigger=analysis latency=60.5s valid=True
+04:11:07 trial T164: bluegreen / bad-image-after-abort / auto
+04:11:07 reset: deleting old ReplicaSet mttr-app-65b78f7bdc
+04:11:13   setup-release 
+04:12:34   setup-revert 
+04:12:39   setup-done {"hash": "58b7c6db45", "annotation_kept": true}
+04:13:09   trial-start 
+04:13:09   commit-release {"release": "T164"}
+04:13:14   release-applied {"hash": "7b65b884b6"}
+04:13:16   fault-confirmed 
+04:18:14   trial-timeout 
+04:18:14 trial T164: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+04:18:14 trial T165: bluegreen / network-partition / auto
+04:18:15 reset: committing the baseline release to bluegreen/rollout.yaml
+04:18:18 reset: deleting old ReplicaSet mttr-app-58b7c6db45
+04:18:49 reset: deleting old ReplicaSet mttr-app-7b65b884b6
+04:19:25   trial-start 
+04:19:25   commit-release {"release": "T165"}
+04:19:32   chaos-created {"TARGET_HASH": "84fd744c86"}
+04:19:34   fault-confirmed 
+04:20:17   operator-sees-failure {"reason": "rollout aborted"}
+04:21:02   operator-revert-commit 
+04:21:38   trial-end 
+04:21:38 trial T165: MTTR_full=94.7s MTTR_service=0.0s trigger=analysis latency=43.7s valid=True
+04:21:38 trial T166: bluegreen / bad-image / auto
+04:21:39 reset: deleting old ReplicaSet mttr-app-84fd744c86
+04:22:16   trial-start 
+04:22:16   commit-release {"release": "T166"}
+04:22:21   release-applied {"hash": "ff6fbcf88"}
+04:22:23   fault-confirmed 
+04:23:52   operator-sees-failure {"reason": "rollout aborted"}
+04:24:37   operator-revert-commit 
+04:25:12   trial-end 
+04:25:13 trial T166: MTTR_full=141.6s MTTR_service=0.0s trigger=deadline latency=91.0s valid=True
+04:25:13 trial T167: canary / control-stable-crash / auto
+04:25:13 reset: deleting old ReplicaSet mttr-app-8556874cbf
+04:25:50   trial-start 
+04:25:50   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-dl86b"}
+04:26:01   fault-confirmed 
+04:26:50   chaos-stopped 
+04:28:09   trial-end 
+04:28:09 trial T167: MTTR_full=99.1s MTTR_service=50.8s trigger=none latency=nans valid=True
+04:28:09 trial T168: rolling / bad-image / auto
+04:28:10 reset: deleting old ReplicaSet mttr-app-74864f88d4
+04:28:46   trial-start 
+04:28:46   commit-release {"release": "T168"}
+04:28:51   release-applied {"hash": "5fbf8b4bd6"}
+04:28:53   fault-confirmed 
+04:30:22   operator-sees-failure {"reason": "rollout aborted"}
+04:31:07   operator-revert-commit 
+04:31:43   trial-end 
+04:31:43 trial T168: MTTR_full=141.5s MTTR_service=0.0s trigger=deadline latency=90.7s valid=True
+04:31:43 trial T169: canary / cp-argocd-gitea-revert / auto
+04:31:44 reset: replacing restarted pod mttr-app-6c94459d65-dl86b
+04:32:22   trial-start 
+04:32:22   commit-release {"release": "T169"}
+04:32:28   release-applied {"hash": "577f845998"}
+04:33:14   operator-sees-failure {"reason": "rollout aborted"}
+04:33:59   revert-chaos-created {"manifests": [["NetworkChaos", "repo-server-gitea-t169"]]}
+04:33:59   operator-revert-commit 
+04:35:59   revert-chaos-stopped 
+04:37:55   trial-end 
+04:37:55 trial T169: MTTR_full=296.8s MTTR_service=41.9s trigger=analysis latency=46.0s valid=True
+04:37:55 trial T170: canary / cp-rollouts-prometheus-healthy-long / auto
+04:37:56 reset: deleting old ReplicaSet mttr-app-577f845998
+04:38:32   trial-start 
+04:38:32   commit-release {"release": "T170"}
+04:38:39   chaos-created {"TARGET_HASH": "5b79498556"}
+04:38:40   fault-confirmed 
+04:43:40   chaos-stopped 
+04:44:10   trial-end 
+04:44:10 trial T170: MTTR_full=181.3s MTTR_service=0.0s trigger=none latency=nans valid=True
+04:44:10 trial T171: canary / faulty-release / auto
+04:44:11 reset: committing the baseline release to canary/rollout.yaml
+04:44:12 reset: deleting old ReplicaSet mttr-app-6c94459d65
+04:47:49 reset: deleting old ReplicaSet mttr-app-5b79498556
+04:48:26   trial-start 
+04:48:26   commit-release {"release": "T171"}
+04:48:31   release-applied {"hash": "647d879bbc"}
+04:49:17   operator-sees-failure {"reason": "rollout aborted"}
+04:50:02   operator-revert-commit 
+04:50:38   trial-end 
+04:50:38 trial T171: MTTR_full=97.1s MTTR_service=41.7s trigger=analysis latency=45.8s valid=True
+04:50:38 trial T172: bluegreen / faulty-release / auto
+04:50:39 reset: deleting old ReplicaSet mttr-app-ff6fbcf88
+04:51:16   trial-start 
+04:51:16   commit-release {"release": "T172"}
+04:51:21   release-applied {"hash": "7d74dc599d"}
+04:52:09   operator-sees-failure {"reason": "rollout aborted"}
+04:52:54   operator-revert-commit 
+04:53:28   trial-end 
+04:53:28 trial T172: MTTR_full=97.3s MTTR_service=0.0s trigger=analysis latency=47.7s valid=True
+04:53:28 trial T173: canary / cp-rollouts-prometheus-faulty-long / auto
+04:53:29 reset: deleting old ReplicaSet mttr-app-647d879bbc
+04:54:05   trial-start 
+04:54:05   commit-release {"release": "T173"}
+04:54:11   chaos-created {"TARGET_HASH": "6ddf665ffc"}
+04:54:11   fault-confirmed 
+04:57:13   operator-sees-failure {"reason": "SLO alert"}
+04:57:58   operator-revert-commit 
+04:59:11   chaos-stopped 
+05:02:06   trial-end 
+05:02:06 trial T173: MTTR_full=416.5s MTTR_service=416.5s trigger=none latency=nans valid=True
+05:02:06 trial T174: canary / config-drift / manual
+05:02:07 reset: deleting old ReplicaSet mttr-app-6ddf665ffc
+05:02:44   trial-start 
+05:02:44   live-patched 
+05:02:44   operator-sees-outofsync 
+05:03:29   operator-sync 
+05:03:33   operator-sees-outofsync 
+05:04:30   trial-end 
+05:04:30 trial T174: MTTR_full=49.3s MTTR_service=43.8s trigger=analysis latency=46.0s valid=True
+05:04:30 trial T175: bluegreen / crashloop / auto
+05:04:31 reset: deleting old ReplicaSet mttr-app-7d74dc599d
+05:05:07   trial-start 
+05:05:07   commit-release {"release": "T175"}
+05:05:14   chaos-created {"TARGET_HASH": "59c59d556c"}
+05:05:25   fault-confirmed 
+05:05:28   operator-sees-failure {"reason": "rollout aborted"}
+05:06:13   operator-revert-commit 
+05:06:49   trial-end 
+05:06:50 trial T175: MTTR_full=55.2s MTTR_service=0.0s trigger=analysis latency=3.8s valid=True
+05:06:50 trial T176: canary / control-stable-partition / auto
+05:06:50 reset: deleting old ReplicaSet mttr-app-8556874cbf
+05:07:27   trial-start 
+05:07:27   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-s2plv"}
+05:07:28   fault-confirmed 
+05:08:59   trial-end 
+05:08:59 trial T176: MTTR_full=59.1s MTTR_service=59.1s trigger=none latency=nans valid=True
+05:08:59 trial T177: bluegreen / config-drift / auto
+05:09:00 reset: deleting old ReplicaSet mttr-app-59c59d556c
+05:09:36   trial-start 
+05:09:36   live-patched 
+05:10:38   trial-end 
+05:10:38 trial T177: MTTR_full=1.6s MTTR_service=0.0s trigger=none latency=nans valid=True
+05:10:38 trial T178: canary / control-stable-crash / auto
+05:11:15   trial-start 
+05:11:15   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-l7lkx"}
+05:11:26   fault-confirmed 
+05:12:16   chaos-stopped 
+05:13:35   trial-end 
+05:13:35 trial T178: MTTR_full=100.1s MTTR_service=51.8s trigger=none latency=nans valid=True
+05:13:35 trial T179: canary / cp-rollouts-prometheus-healthy / auto
+05:13:36 reset: replacing restarted pod mttr-app-6c94459d65-l7lkx
+05:14:15   trial-start 
+05:14:15   commit-release {"release": "T179"}
+05:14:22   chaos-created {"TARGET_HASH": "5bff7d8f99"}
+05:14:23   fault-confirmed 
+05:16:22   chaos-stopped 
+05:18:23   trial-end 
+05:18:23 trial T179: MTTR_full=181.1s MTTR_service=0.0s trigger=none latency=nans valid=True
+05:18:23 trial T180: rolling / bad-image / auto
+05:18:24 reset: deleting old ReplicaSet mttr-app-5fbf8b4bd6
+05:19:00   trial-start 
+05:19:00   commit-release {"release": "T180"}
+05:19:05   release-applied {"hash": "6b5fb446d"}
+05:19:07   fault-confirmed 
+05:20:36   operator-sees-failure {"reason": "rollout aborted"}
+05:21:21   operator-revert-commit 
+05:21:57   trial-end 
+05:21:57 trial T180: MTTR_full=141.4s MTTR_service=0.0s trigger=deadline latency=90.2s valid=True
+05:21:57 trial T181: bluegreen / network-partition / auto
+05:21:58 reset: deleting old ReplicaSet mttr-app-8556874cbf
+05:22:35   trial-start 
+05:22:35   commit-release {"release": "T181"}
+05:22:42   chaos-created {"TARGET_HASH": "74db76649b"}
+05:22:44   fault-confirmed 
+05:23:27   operator-sees-failure {"reason": "rollout aborted"}
+05:24:12   operator-revert-commit 
+05:24:47   trial-end 
+05:24:47 trial T181: MTTR_full=94.4s MTTR_service=0.0s trigger=analysis latency=43.8s valid=True
+05:24:47 trial T182: bluegreen / cp-rollouts-prometheus-faulty / auto
+05:24:48 reset: deleting old ReplicaSet mttr-app-74db76649b
+05:25:24   trial-start 
+05:25:24   commit-release {"release": "T182"}
+05:25:33   chaos-created {"TARGET_HASH": "5b884489fc"}
+05:25:34   fault-confirmed 
+05:27:01   operator-sees-failure {"reason": "rollout aborted"}
+05:27:33   chaos-stopped 
+05:27:46   operator-revert-commit 
+05:28:22   trial-end 
+05:28:22 trial T182: MTTR_full=138.6s MTTR_service=0.0s trigger=deadline latency=87.4s valid=True
+05:28:22 trial T183: rolling / bad-image-after-abort / auto
+05:28:23 reset: deleting old ReplicaSet mttr-app-6b5fb446d
+05:28:29   setup-release 
+05:29:22   setup-revert 
+05:29:28   setup-done {"hash": "7945b74cf4", "annotation_kept": false}
+05:29:58   trial-start 
+05:29:58   commit-release {"release": "T183"}
+05:30:03   release-applied {"hash": "5bbbf5474f"}
+05:30:05   fault-confirmed 
+05:31:34   operator-sees-failure {"reason": "rollout aborted"}
+05:32:19   operator-revert-commit 
+05:32:54   trial-end 
+05:32:55 trial T183: MTTR_full=141.3s MTTR_service=0.0s trigger=deadline latency=90.8s valid=False
+05:32:55 trial T184: rolling / cp-rollouts-prometheus-faulty-long / auto
+05:32:55 reset: deleting old ReplicaSet mttr-app-5bbbf5474f
+05:32:55 reset: deleting old ReplicaSet mttr-app-7945b74cf4
+05:33:32   trial-start 
+05:33:32   commit-release {"release": "T184"}
+05:33:39   chaos-created {"TARGET_HASH": "7b5b756b67"}
+05:33:40   fault-confirmed 
+05:36:42   operator-sees-failure {"reason": "SLO alert"}
+05:37:27   operator-revert-commit 
+05:38:39   chaos-stopped 
+05:41:11   trial-end 
+05:41:11 trial T184: MTTR_full=419.4s MTTR_service=419.4s trigger=none latency=nans valid=True
+05:41:11 trial T185: canary / bad-image / auto
+05:41:12 reset: committing the baseline release to canary/rollout.yaml
+05:41:13 reset: deleting old ReplicaSet mttr-app-6c94459d65
+05:44:48 reset: deleting old ReplicaSet mttr-app-5bff7d8f99
+05:45:25   trial-start 
+05:45:25   commit-release {"release": "T185"}
+05:45:31   release-applied {"hash": "6cc89897c5"}
+05:45:33   fault-confirmed 
+05:47:02   operator-sees-failure {"reason": "rollout aborted"}
+05:47:47   operator-revert-commit 
+05:48:23   trial-end 
+05:48:23 trial T185: MTTR_full=141.0s MTTR_service=0.0s trigger=deadline latency=90.2s valid=True
+05:48:23 trial T186: rolling / cp-rollouts-prometheus-faulty / auto
+05:48:24 reset: deleting old ReplicaSet mttr-app-7b5b756b67
+05:48:59   trial-start 
+05:49:00   commit-release {"release": "T186"}
+05:49:07   chaos-created {"TARGET_HASH": "6f97dc57d9"}
+05:49:07   fault-confirmed 
+05:51:07   chaos-stopped 
+05:51:36   operator-sees-failure {"reason": "rollout aborted"}
+05:52:21   operator-revert-commit 
+05:52:56   trial-end 
+05:52:56 trial T186: MTTR_full=198.7s MTTR_service=153.5s trigger=analysis latency=148.6s valid=True
+05:52:56 trial T187: canary / cp-argocd-gitea-revert / auto
+05:52:57 reset: deleting old ReplicaSet mttr-app-6cc89897c5
+05:53:33   trial-start 
+05:53:33   commit-release {"release": "T187"}
+05:53:38   release-applied {"hash": "794b9f546b"}
+05:54:24   operator-sees-failure {"reason": "rollout aborted"}
+05:55:09   revert-chaos-created {"manifests": [["NetworkChaos", "repo-server-gitea-t187"]]}
+05:55:09   operator-revert-commit 
+05:57:09   revert-chaos-stopped 
+05:58:55   trial-end 
+05:58:56 trial T187: MTTR_full=287.5s MTTR_service=44.8s trigger=analysis latency=45.9s valid=True
+05:58:56 trial T188: canary / cp-rollouts-prometheus-healthy-long / auto
+05:58:57 reset: deleting old ReplicaSet mttr-app-794b9f546b
+05:59:33   trial-start 
+05:59:33   commit-release {"release": "T188"}
+05:59:40   chaos-created {"TARGET_HASH": "686587978c"}
+05:59:40   fault-confirmed 
+06:04:40   chaos-stopped 
+06:05:10   trial-end 
+06:05:10 trial T188: MTTR_full=181.2s MTTR_service=0.0s trigger=none latency=nans valid=True
+06:05:10 trial T189: canary / cp-rollouts-prometheus-faulty / auto
+06:05:11 reset: committing the baseline release to canary/rollout.yaml
+06:05:12 reset: deleting old ReplicaSet mttr-app-6c94459d65
+06:08:47 reset: deleting old ReplicaSet mttr-app-686587978c
+06:09:23   trial-start 
+06:09:23   commit-release {"release": "T189"}
+06:09:30   chaos-created {"TARGET_HASH": "78f96fcc6"}
+06:09:31   fault-confirmed 
+06:11:30   chaos-stopped 
+06:12:00   operator-sees-failure {"reason": "rollout aborted"}
+06:12:45   operator-revert-commit 
+06:13:20   trial-end 
+06:13:21 trial T189: MTTR_full=199.5s MTTR_service=149.9s trigger=analysis latency=149.0s valid=True
+06:13:21 trial T190: rolling / crashloop / auto
+06:13:21 reset: deleting old ReplicaSet mttr-app-6f97dc57d9
+06:13:58   trial-start 
+06:13:58   commit-release {"release": "T190"}
+06:14:04   chaos-created {"TARGET_HASH": "b96b4947d"}
+06:14:15   fault-confirmed 
+06:14:34   operator-sees-failure {"reason": "rollout aborted"}
+06:15:19   operator-revert-commit 
+06:15:54   trial-end 
+06:15:55 trial T190: MTTR_full=70.5s MTTR_service=10.8s trigger=analysis latency=20.0s valid=True
+06:15:55 trial T191: canary / config-drift / auto
+06:15:56 reset: deleting old ReplicaSet mttr-app-78f96fcc6
+06:16:32   trial-start 
+06:16:32   live-patched 
+06:17:05   trial-end 
+06:17:05 trial T191: MTTR_full=1.4s MTTR_service=0.0s trigger=none latency=nans valid=True
+06:17:05 trial T192: bluegreen / bad-image / auto
+06:17:06 reset: deleting old ReplicaSet mttr-app-5b884489fc
+06:17:42   trial-start 
+06:17:42   commit-release {"release": "T192"}
+06:17:48   release-applied {"hash": "5c894f9bd7"}
+06:17:49   fault-confirmed 
+06:19:19   operator-sees-failure {"reason": "rollout aborted"}
+06:20:04   operator-revert-commit 
+06:20:39   trial-end 
+06:20:39 trial T192: MTTR_full=141.2s MTTR_service=0.0s trigger=deadline latency=91.0s valid=True
+06:20:39 trial T193: canary / faulty-release / manual
+06:20:40 reset: deleting old ReplicaSet mttr-app-8556874cbf
+06:21:16   trial-start 
+06:21:16   commit-release {"release": "T193"}
+06:21:20   deploy-sync 
+06:21:22   release-applied {"hash": "696c4589c5"}
+06:22:23   operator-sees-failure {"reason": "rollout aborted"}
+06:23:08   operator-revert-commit 
+06:23:12   operator-sees-outofsync 
+06:23:57   operator-sync 
+06:23:58   operator-sees-outofsync 
+06:24:29   trial-end 
+06:24:29 trial T193: MTTR_full=156.2s MTTR_service=63.3s trigger=analysis latency=60.5s valid=True
+06:24:29 trial T194: bluegreen / config-drift / manual
+06:24:30 reset: deleting old ReplicaSet mttr-app-5c894f9bd7
+06:25:06   trial-start 
+06:25:06   live-patched 
+06:25:06   operator-sees-outofsync 
+06:25:51   operator-sync 
+06:26:53   trial-end 
+06:26:53 trial T194: MTTR_full=47.3s MTTR_service=0.0s trigger=analysis latency=46.9s valid=True
+06:26:53 trial T195: rolling / network-partition / auto
+06:26:54 reset: deleting old ReplicaSet mttr-app-b96b4947d
+06:27:30   trial-start 
+06:27:30   commit-release {"release": "T195"}
+06:27:38   chaos-created {"TARGET_HASH": "7ffc968fb9"}
+06:27:39   fault-confirmed 
+06:28:23   operator-sees-failure {"reason": "rollout aborted"}
+06:29:08   operator-revert-commit 
+06:29:44   trial-end 
+06:29:44 trial T195: MTTR_full=95.4s MTTR_service=48.4s trigger=analysis latency=44.5s valid=True
+06:29:44 trial T196: rolling / config-drift / auto
+06:29:45 reset: deleting old ReplicaSet mttr-app-7ffc968fb9
+06:30:21   trial-start 
+06:30:21   live-patched 
+06:30:57   trial-end 
+06:30:57 trial T196: MTTR_full=3.1s MTTR_service=3.1s trigger=none latency=nans valid=True
+06:30:57 trial T197: canary / faulty-release / auto
+06:30:58 reset: deleting old ReplicaSet mttr-app-696c4589c5
+06:31:34   trial-start 
+06:31:34   commit-release {"release": "T197"}
+06:31:39   release-applied {"hash": "7b5754f87f"}
+06:32:40   operator-sees-failure {"reason": "rollout aborted"}
+06:33:25   webhooks-disabled 
+06:33:25   operator-revert-commit 
+06:37:56   trial-end 
+06:37:56 trial T197: MTTR_full=347.2s MTTR_service=63.9s trigger=analysis latency=61.0s valid=True
+06:37:56 trial T198: bluegreen / cp-rollouts-prometheus-faulty-long / auto
+06:37:57 reset: deleting old ReplicaSet mttr-app-8556874cbf
+06:38:33   trial-start 
+06:38:33   commit-release {"release": "T198"}
+06:38:40   chaos-created {"TARGET_HASH": "5f8964994"}
+06:38:41   fault-confirmed 
+06:40:09   operator-sees-failure {"reason": "rollout aborted"}
+06:40:54   operator-revert-commit 
+06:43:40   chaos-stopped 
+06:44:10   trial-end 
+06:44:11 trial T198: MTTR_full=136.9s MTTR_service=0.0s trigger=deadline latency=88.1s valid=True
+06:44:11 trial T199: canary / crashloop / auto
+06:44:12 reset: deleting old ReplicaSet mttr-app-7b5754f87f
+06:44:48   trial-start 
+06:44:48   commit-release {"release": "T199"}
+06:44:54   chaos-created {"TARGET_HASH": "648bdccdb9"}
+06:45:05   fault-confirmed 
+06:45:24   operator-sees-failure {"reason": "rollout aborted"}
+06:46:09   operator-revert-commit 
+06:46:44   trial-end 
+06:46:44 trial T199: MTTR_full=70.0s MTTR_service=12.8s trigger=analysis latency=20.0s valid=True
+06:46:44 trial T200: rolling / faulty-release / auto
+06:46:45 reset: deleting old ReplicaSet mttr-app-8556874cbf
+06:47:21   trial-start 
+06:47:22   commit-release {"release": "T200"}
+06:47:25   release-applied {"hash": "58785df55d"}
+06:48:11   operator-sees-failure {"reason": "rollout aborted"}
+06:48:56   operator-revert-commit 
+06:49:30   trial-end 
+06:49:30 trial T200: MTTR_full=95.3s MTTR_service=49.8s trigger=analysis latency=45.9s valid=True
+06:49:30 trial T201: bluegreen / bad-image-after-abort / auto
+06:49:31 reset: deleting old ReplicaSet mttr-app-5f8964994
+06:49:38   setup-release 
+06:50:58   setup-revert 
+06:51:03   setup-done {"hash": "76c755965c", "annotation_kept": true}
+06:51:33   trial-start 
+06:51:33   commit-release {"release": "T201"}
+06:51:38   release-applied {"hash": "6577d5c7b6"}
+06:51:39   fault-confirmed 
+06:56:38   trial-timeout 
+06:56:38 trial T201: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+06:56:38 trial T202: canary / bad-image-after-abort / auto
+06:56:38 reset: bluegreen was left on a stuck release
+06:56:39 reset: committing the baseline release to bluegreen/rollout.yaml
+06:56:44 reset: deleting old ReplicaSet mttr-app-76c755965c
+06:57:13 reset: deleting old ReplicaSet mttr-app-6577d5c7b6
+06:57:13 reset: deleting old ReplicaSet mttr-app-648bdccdb9
+06:57:20   setup-release 
+06:58:40   setup-revert 
+06:58:43   setup-done {"hash": "6f6747ff6", "annotation_kept": true}
+06:59:13   trial-start 
+06:59:13   commit-release {"release": "T202"}
+06:59:18   release-applied {"hash": "79d94f848c"}
+06:59:20   fault-confirmed 
+07:04:18   trial-timeout 
+07:04:19 trial T202: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+07:04:19 trial T203: rolling / config-drift / manual
+07:04:19 reset: canary was left on a stuck release
+07:04:19 reset: committing the baseline release to canary/rollout.yaml
+07:04:25 reset: deleting old ReplicaSet mttr-app-6f6747ff6
+07:04:25 reset: deleting old ReplicaSet mttr-app-79d94f848c
+07:04:25 reset: deleting old ReplicaSet mttr-app-58785df55d
+07:05:02   trial-start 
+07:05:02   live-patched 
+07:05:02   operator-sees-outofsync 
+07:05:47   operator-sync 
+07:06:24   trial-end 
+07:06:24 trial T203: MTTR_full=49.5s MTTR_service=49.5s trigger=analysis latency=45.6s valid=True
+07:06:24 trial T204: canary / network-partition / auto
+07:07:02   trial-start 
+07:07:02   commit-release {"release": "T204"}
+07:07:06   chaos-created {"TARGET_HASH": "65f7887c74"}
+07:07:07   fault-confirmed 
+07:07:51   operator-sees-failure {"reason": "rollout aborted"}
+07:08:36   operator-revert-commit 
+07:09:10   trial-end 
+07:09:11 trial T204: MTTR_full=93.7s MTTR_service=44.0s trigger=analysis latency=44.1s valid=True
+07:09:11 trial T205: rolling / cp-rollouts-prometheus-faulty / auto
+07:09:12 reset: deleting old ReplicaSet mttr-app-8556874cbf
+07:09:48   trial-start 
+07:09:48   commit-release {"release": "T205"}
+07:09:53   chaos-created {"TARGET_HASH": "564bdb7cc"}
+07:09:54   fault-confirmed 
+07:11:53   chaos-stopped 
+07:12:23   operator-sees-failure {"reason": "rollout aborted"}
+07:13:08   operator-revert-commit 
+07:13:43   trial-end 
+07:13:43 trial T205: MTTR_full=199.0s MTTR_service=155.2s trigger=analysis latency=149.3s valid=True
+07:13:43 trial T206: rolling / bad-image / auto
+07:13:44 reset: deleting old ReplicaSet mttr-app-564bdb7cc
+07:14:20   trial-start 
+07:14:20   commit-release {"release": "T206"}
+07:14:23   release-applied {"hash": "679995575"}
+07:14:25   fault-confirmed 
+07:15:54   operator-sees-failure {"reason": "rollout aborted"}
+07:16:39   operator-revert-commit 
+07:17:13   trial-end 
+07:17:13 trial T206: MTTR_full=139.5s MTTR_service=0.0s trigger=deadline latency=90.2s valid=True
+07:17:13 trial T207: canary / faulty-release / manual
+07:17:14 reset: deleting old ReplicaSet mttr-app-65f7887c74
+07:17:50   trial-start 
+07:17:50   commit-release {"release": "T207"}
+07:17:52   deploy-sync 
+07:17:54   release-applied {"hash": "665c8d667f"}
+07:18:40   operator-sees-failure {"reason": "rollout aborted"}
+07:19:25   operator-revert-commit 
+07:19:28   operator-sees-outofsync 
+07:20:13   operator-sync 
+07:20:45   trial-end 
+07:20:45 trial T207: MTTR_full=140.3s MTTR_service=44.5s trigger=analysis latency=45.6s valid=True
+07:20:45 trial T208: rolling / crashloop / auto
+07:20:46 reset: deleting old ReplicaSet mttr-app-679995575
+07:21:22   trial-start 
+07:21:22   commit-release {"release": "T208"}
+07:21:28   chaos-created {"TARGET_HASH": "5cb76d498"}
+07:21:38   fault-confirmed 
+07:21:43   operator-sees-failure {"reason": "rollout aborted"}
+07:22:28   operator-revert-commit 
+07:23:02   trial-end 
+07:23:02 trial T208: MTTR_full=53.9s MTTR_service=0.8s trigger=analysis latency=4.9s valid=True
+07:23:02 trial T209: bluegreen / crashloop / auto
+07:23:39   trial-start 
+07:23:39   commit-release {"release": "T209"}
+07:23:44   chaos-created {"TARGET_HASH": "745d688c57"}
+07:23:55   fault-confirmed 
+07:23:59   operator-sees-failure {"reason": "rollout aborted"}
+07:24:44   operator-revert-commit 
+07:25:18   trial-end 
+07:25:18 trial T209: MTTR_full=54.1s MTTR_service=0.0s trigger=analysis latency=4.8s valid=True
+07:25:18 trial T210: canary / faulty-release / auto
+07:25:19 reset: deleting old ReplicaSet mttr-app-665c8d667f
+07:25:56   trial-start 
+07:25:56   commit-release {"release": "T210"}
+07:25:59   release-applied {"hash": "69d576695"}
+07:26:46   operator-sees-failure {"reason": "rollout aborted"}
+07:27:31   webhooks-disabled 
+07:27:31   operator-revert-commit 
+07:31:56   trial-end 
+07:31:56 trial T210: MTTR_full=326.4s MTTR_service=42.5s trigger=analysis latency=46.6s valid=True
+07:31:56 trial T211: canary / cp-rollouts-prometheus-faulty / auto
+07:31:57 reset: deleting old ReplicaSet mttr-app-69d576695
+07:32:33   trial-start 
+07:32:33   commit-release {"release": "T211"}
+07:32:40   chaos-created {"TARGET_HASH": "7fbc859f4d"}
+07:32:40   fault-confirmed 
+07:34:40   chaos-stopped 
+07:35:09   operator-sees-failure {"reason": "rollout aborted"}
+07:35:54   operator-revert-commit 
+07:36:30   trial-end 
+07:36:30 trial T211: MTTR_full=199.5s MTTR_service=148.4s trigger=analysis latency=148.5s valid=True
+07:36:30 trial T212: bluegreen / cp-rollouts-prometheus-faulty-long / auto
+07:36:31 reset: deleting old ReplicaSet mttr-app-745d688c57
+07:37:08   trial-start 
+07:37:08   commit-release {"release": "T212"}
+07:37:15   chaos-created {"TARGET_HASH": "97b9bb6f"}
+07:37:16   fault-confirmed 
+07:38:44   operator-sees-failure {"reason": "rollout aborted"}
+07:39:29   operator-revert-commit 
+07:42:15   chaos-stopped 
+07:42:45   trial-end 
+07:42:45 trial T212: MTTR_full=138.8s MTTR_service=0.0s trigger=deadline latency=88.3s valid=True
+07:42:45 trial T213: rolling / network-partition / auto
+07:42:46 reset: deleting old ReplicaSet mttr-app-5cb76d498
+07:43:22   trial-start 
+07:43:22   commit-release {"release": "T213"}
+07:43:28   chaos-created {"TARGET_HASH": "645d757d66"}
+07:43:29   fault-confirmed 
+07:44:13   operator-sees-failure {"reason": "rollout aborted"}
+07:44:58   operator-revert-commit 
+07:45:32   trial-end 
+07:45:33 trial T213: MTTR_full=93.7s MTTR_service=47.9s trigger=analysis latency=44.0s valid=True
+07:45:33 trial T214: bluegreen / faulty-release / auto
+07:45:33 reset: deleting old ReplicaSet mttr-app-97b9bb6f
+07:46:09   trial-start 
+07:46:09   commit-release {"release": "T214"}
+07:46:14   release-applied {"hash": "7568b678c5"}
+07:47:00   operator-sees-failure {"reason": "rollout aborted"}
+07:47:45   operator-revert-commit 
+07:48:21   trial-end 
+07:48:21 trial T214: MTTR_full=97.1s MTTR_service=0.0s trigger=analysis latency=46.0s valid=True
+07:48:21 trial T215: canary / faulty-release / auto
+07:48:22 reset: deleting old ReplicaSet mttr-app-7fbc859f4d
+07:48:59   trial-start 
+07:48:59   commit-release {"release": "T215"}
+07:49:04   release-applied {"hash": "775c56bd4"}
+07:49:50   operator-sees-failure {"reason": "rollout aborted"}
+07:50:35   operator-revert-commit 
+07:51:09   trial-end 
+07:51:09 trial T215: MTTR_full=95.2s MTTR_service=45.7s trigger=analysis latency=45.8s valid=True
+07:51:09 trial T216: bluegreen / network-partition / auto
+07:51:10 reset: deleting old ReplicaSet mttr-app-7568b678c5
+07:51:47   trial-start 
+07:51:47   commit-release {"release": "T216"}
+07:51:54   chaos-created {"TARGET_HASH": "75b7dfb977"}
+07:51:56   fault-confirmed 
+07:52:39   operator-sees-failure {"reason": "rollout aborted"}
+07:53:24   operator-revert-commit 
+07:54:00   trial-end 
+07:54:00 trial T216: MTTR_full=95.1s MTTR_service=0.0s trigger=analysis latency=44.2s valid=True
+07:54:00 trial T217: rolling / config-drift / manual
+07:54:01 reset: deleting old ReplicaSet mttr-app-645d757d66
+07:54:37   trial-start 
+07:54:37   live-patched 
+07:54:38   operator-sees-outofsync 
+07:55:23   operator-sync 
+07:55:58   trial-end 
+07:55:58 trial T217: MTTR_full=48.1s MTTR_service=48.1s trigger=analysis latency=46.2s valid=True
+07:55:58 trial T218: canary / crashloop / auto
+07:55:59 reset: deleting old ReplicaSet mttr-app-775c56bd4
+07:56:35   trial-start 
+07:56:35   commit-release {"release": "T218"}
+07:56:43   chaos-created {"TARGET_HASH": "5b8978d8ff"}
+07:56:54   fault-confirmed 
+07:56:57   operator-sees-failure {"reason": "rollout aborted"}
+07:57:42   operator-revert-commit 
+07:58:18   trial-end 
+07:58:18 trial T218: MTTR_full=55.3s MTTR_service=2.8s trigger=analysis latency=3.9s valid=True
+07:58:18 trial T219: canary / cp-rollouts-prometheus-faulty-long / auto
+07:58:19 reset: deleting old ReplicaSet mttr-app-5b8978d8ff
+07:58:56   trial-start 
+07:58:56   commit-release {"release": "T219"}
+07:59:03   chaos-created {"TARGET_HASH": "6f84496c5b"}
+07:59:03   fault-confirmed 
+08:02:04   operator-sees-failure {"reason": "SLO alert"}
+08:02:49   operator-revert-commit 
+08:04:03   chaos-stopped 
+08:06:57   trial-end 
+08:06:57 trial T219: MTTR_full=416.5s MTTR_service=416.5s trigger=none latency=nans valid=True
+08:06:57 trial T220: bluegreen / bad-image / auto
+08:06:58 reset: deleting old ReplicaSet mttr-app-75b7dfb977
+08:07:35   trial-start 
+08:07:35   commit-release {"release": "T220"}
+08:07:40   release-applied {"hash": "7bddd799f5"}
+08:07:42   fault-confirmed 
+08:09:11   operator-sees-failure {"reason": "rollout aborted"}
+08:09:56   operator-revert-commit 
+08:10:31   trial-end 
+08:10:31 trial T220: MTTR_full=141.4s MTTR_service=0.0s trigger=deadline latency=91.0s valid=True
+08:10:31 trial T221: canary / config-drift / auto
+08:10:32 reset: deleting old ReplicaSet mttr-app-6f84496c5b
+08:11:08   trial-start 
+08:11:08   live-patched 
+08:12:10   trial-end 
+08:12:10 trial T221: MTTR_full=1.5s MTTR_service=0.0s trigger=none latency=nans valid=True
+08:12:10 trial T222: canary / config-drift / manual
+08:12:11 reset: deleting old ReplicaSet mttr-app-8556874cbf
+08:12:47   trial-start 
+08:12:47   live-patched 
+08:12:47   operator-sees-outofsync 
+08:13:32   operator-sync 
+08:14:33   trial-end 
+08:14:33 trial T222: MTTR_full=48.7s MTTR_service=44.8s trigger=analysis latency=45.9s valid=True
+08:14:33 trial T223: canary / cp-argocd-gitea-revert / auto
+08:14:34 reset: deleting old ReplicaSet mttr-app-8556874cbf
+08:15:10   trial-start 
+08:15:10   commit-release {"release": "T223"}
+08:15:14   release-applied {"hash": "85b6478bfc"}
+08:16:00   operator-sees-failure {"reason": "rollout aborted"}
+08:16:45   revert-chaos-created {"manifests": [["NetworkChaos", "repo-server-gitea-t223"]]}
+08:16:45   operator-revert-commit 
+08:18:45   revert-chaos-stopped 
+08:22:55   trial-end 
+08:22:55 trial T223: MTTR_full=430.4s MTTR_service=32.7s trigger=analysis latency=45.8s valid=True
+08:22:55 trial T224: canary / network-partition / auto
+08:22:56 reset: deleting old ReplicaSet mttr-app-85b6478bfc
+08:23:33   trial-start 
+08:23:33   commit-release {"release": "T224"}
+08:23:40   chaos-created {"TARGET_HASH": "6f6cf68bb8"}
+08:23:41   fault-confirmed 
+08:24:24   operator-sees-failure {"reason": "rollout aborted"}
+08:25:09   operator-revert-commit 
+08:25:44   trial-end 
+08:25:44 trial T224: MTTR_full=93.7s MTTR_service=43.4s trigger=analysis latency=43.5s valid=True
+08:25:44 trial T225: bluegreen / bad-image-after-abort / auto
+08:25:45 reset: deleting old ReplicaSet mttr-app-7bddd799f5
+08:25:52   setup-release 
+08:27:14   setup-revert 
+08:27:18   setup-done {"hash": "84cd7854d7", "annotation_kept": true}
+08:27:48   trial-start 
+08:27:48   commit-release {"release": "T225"}
+08:27:53   release-applied {"hash": "5d679b4d44"}
+08:27:55   fault-confirmed 
+08:32:53   trial-timeout 
+08:32:54 trial T225: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+08:32:54 trial T226: bluegreen / config-drift / auto
+08:32:54 reset: committing the baseline release to bluegreen/rollout.yaml
+08:32:58 reset: deleting old ReplicaSet mttr-app-84cd7854d7
+08:33:29 reset: deleting old ReplicaSet mttr-app-5d679b4d44
+08:34:05   trial-start 
+08:34:05   live-patched 
+08:35:07   trial-end 
+08:35:07 trial T226: MTTR_full=1.7s MTTR_service=0.0s trigger=none latency=nans valid=True
+08:35:07 trial T227: canary / bad-image-after-abort / auto
+08:35:08 reset: deleting old ReplicaSet mttr-app-6f6cf68bb8
+08:35:14   setup-release 
+08:36:36   setup-revert 
+08:36:41   setup-done {"hash": "7456cc7485", "annotation_kept": true}
+08:37:11   trial-start 
+08:37:11   commit-release {"release": "T227"}
+08:37:16   release-applied {"hash": "6bb85bcc46"}
+08:37:18   fault-confirmed 
+08:42:17   trial-timeout 
+08:42:17 trial T227: MTTR_full=nans MTTR_service=0.0s trigger=none latency=nans valid=True
+08:42:17 trial T228: rolling / faulty-release / auto
+08:42:17 reset: canary was left on a stuck release
+08:42:18 reset: committing the baseline release to canary/rollout.yaml
+08:42:21 reset: deleting old ReplicaSet mttr-app-6bb85bcc46
+08:42:21 reset: deleting old ReplicaSet mttr-app-7456cc7485
+08:42:21 reset: deleting old ReplicaSet mttr-app-8556874cbf
+08:43:00   trial-start 
+08:43:00   commit-release {"release": "T228"}
+08:43:04   release-applied {"hash": "59684765b4"}
+08:44:05   operator-sees-failure {"reason": "rollout aborted"}
+08:44:50   operator-revert-commit 
+08:45:26   trial-end 
+08:45:26 trial T228: MTTR_full=111.8s MTTR_service=63.4s trigger=analysis latency=60.6s valid=True
+08:45:26 trial T229: bluegreen / cp-rollouts-prometheus-faulty / auto
+08:45:27 reset: deleting old ReplicaSet mttr-app-8556874cbf
+08:46:04   trial-start 
+08:46:04   commit-release {"release": "T229"}
+08:46:11   chaos-created {"TARGET_HASH": "6d7956d6b7"}
+08:46:12   fault-confirmed 
+08:47:40   operator-sees-failure {"reason": "rollout aborted"}
+08:48:11   chaos-stopped 
+08:48:25   operator-revert-commit 
+08:49:00   trial-end 
+08:49:01 trial T229: MTTR_full=139.1s MTTR_service=0.0s trigger=deadline latency=88.4s valid=True
+08:49:01 trial T230: rolling / cp-rollouts-prometheus-faulty-long / auto
+08:49:01 reset: deleting old ReplicaSet mttr-app-59684765b4
+08:49:38   trial-start 
+08:49:38   commit-release {"release": "T230"}
+08:49:44   chaos-created {"TARGET_HASH": "6d96794cfc"}
+08:49:45   fault-confirmed 
+08:52:47   operator-sees-failure {"reason": "SLO alert"}
+08:53:32   operator-revert-commit 
+08:54:45   chaos-stopped 
+08:57:15   trial-end 
+08:57:15 trial T230: MTTR_full=417.6s MTTR_service=417.6s trigger=none latency=nans valid=True
+08:57:15 trial T231: bluegreen / config-drift / manual
+08:57:16 reset: deleting old ReplicaSet mttr-app-6d7956d6b7
+08:57:52   trial-start 
+08:57:53   live-patched 
+08:57:53   operator-sees-outofsync 
+08:58:38   operator-sync 
+08:59:40   trial-end 
+08:59:40 trial T231: MTTR_full=47.2s MTTR_service=0.0s trigger=none latency=nans valid=True
+08:59:40 trial T232: canary / control-stable-crash / auto
+09:00:17   trial-start 
+09:00:17   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-bvxfd"}
+09:00:27   fault-confirmed 
+09:01:17   chaos-stopped 
+09:01:49   trial-end 
+09:01:49 trial T232: MTTR_full=51.7s MTTR_service=24.8s trigger=none latency=nans valid=True
+09:01:49 trial T233: canary / bad-image / auto
+09:01:50 reset: replacing restarted pod mttr-app-6c94459d65-bvxfd
+09:02:27   trial-start 
+09:02:27   commit-release {"release": "T233"}
+09:02:32   release-applied {"hash": "64764449ff"}
+09:02:33   fault-confirmed 
+09:04:03   operator-sees-failure {"reason": "rollout aborted"}
+09:04:48   operator-revert-commit 
+09:05:23   trial-end 
+09:05:23 trial T233: MTTR_full=141.3s MTTR_service=0.0s trigger=deadline latency=90.9s valid=True
+09:05:23 trial T234: rolling / bad-image-after-abort / auto
+09:05:24 reset: deleting old ReplicaSet mttr-app-6d96794cfc
+09:05:31   setup-release 
+09:06:23   setup-revert 
+09:06:27   setup-done {"hash": "5bc67947b9", "annotation_kept": false}
+09:06:57   trial-start 
+09:06:57   commit-release {"release": "T234"}
+09:07:02   release-applied {"hash": "5788574658"}
+09:07:04   fault-confirmed 
+09:08:33   operator-sees-failure {"reason": "rollout aborted"}
+09:09:18   operator-revert-commit 
+09:09:54   trial-end 
+09:09:54 trial T234: MTTR_full=141.3s MTTR_service=0.0s trigger=deadline latency=90.3s valid=False
+09:09:54 trial T235: canary / cp-rollouts-prometheus-healthy-long / auto
+09:09:55 reset: deleting old ReplicaSet mttr-app-64764449ff
+09:10:31   trial-start 
+09:10:31   commit-release {"release": "T235"}
+09:10:38   chaos-created {"TARGET_HASH": "574cbf46bb"}
+09:10:39   fault-confirmed 
+09:15:38   chaos-stopped 
+09:16:08   trial-end 
+09:16:08 trial T235: MTTR_full=181.7s MTTR_service=0.0s trigger=none latency=nans valid=True
+09:16:08 trial T236: canary / cp-rollouts-prometheus-healthy / auto
+09:16:09 reset: committing the baseline release to canary/rollout.yaml
+09:16:10 reset: deleting old ReplicaSet mttr-app-6c94459d65
+09:19:48 reset: deleting old ReplicaSet mttr-app-574cbf46bb
+09:20:24   trial-start 
+09:20:24   commit-release {"release": "T236"}
+09:20:31   chaos-created {"TARGET_HASH": "74cf5fb4c5"}
+09:20:32   fault-confirmed 
+09:22:31   chaos-stopped 
+09:24:33   trial-end 
+09:24:33 trial T236: MTTR_full=181.9s MTTR_service=0.0s trigger=none latency=nans valid=True
+09:24:33 trial T237: rolling / config-drift / auto
+09:24:34 reset: deleting old ReplicaSet mttr-app-5788574658
+09:24:34 reset: deleting old ReplicaSet mttr-app-5bc67947b9
+09:25:10   trial-start 
+09:25:10   live-patched 
+09:25:46   trial-end 
+09:25:46 trial T237: MTTR_full=3.5s MTTR_service=3.5s trigger=none latency=nans valid=True
+09:25:46 trial T238: canary / control-stable-partition / auto
+09:25:47 reset: committing the baseline release to canary/rollout.yaml
+09:25:48 reset: deleting old ReplicaSet mttr-app-6c94459d65
+09:29:23 reset: deleting old ReplicaSet mttr-app-74cf5fb4c5
+09:30:00   trial-start 
+09:30:00   chaos-created {"TARGET_HASH": "6c94459d65", "TARGET_POD": "mttr-app-6c94459d65-877bb"}
+09:30:01   fault-confirmed 
+09:31:32   trial-end 
+09:31:32 trial T238: MTTR_full=58.9s MTTR_service=58.9s trigger=none latency=nans valid=True
+09:31:32 trial T104r1: canary / faulty-release / manual
+09:32:09   trial-start 
+09:32:09   commit-release {"release": "T104r1"}
+09:32:12   deploy-sync 
+09:32:14   release-applied {"hash": "646bbbdc8b"}
+09:33:00   operator-sees-failure {"reason": "rollout aborted"}
+09:33:45   operator-revert-commit 
+09:33:48   operator-sees-outofsync 
+09:34:33   operator-sync 
+09:35:05   trial-end 
+09:35:05 trial T104r1: MTTR_full=140.4s MTTR_service=45.7s trigger=analysis latency=45.8s valid=True
+09:35:05 trial T129r1: rolling / bad-image-after-abort / auto
+09:35:06 reset: deleting old ReplicaSet mttr-app-8556874cbf
+09:35:12   setup-release 
+09:36:04   setup-revert 
+09:36:09   setup-done {"hash": "548c44b595", "annotation_kept": false}
+09:36:39   trial-start 
+09:36:39   commit-release {"release": "T129r1"}
+09:36:45   release-applied {"hash": "5d4fc846b8"}
+09:36:46   fault-confirmed 
+09:38:16   operator-sees-failure {"reason": "rollout aborted"}
+09:39:01   operator-revert-commit 
+09:39:36   trial-end 
+09:39:36 trial T129r1: MTTR_full=141.0s MTTR_service=0.0s trigger=deadline latency=91.0s valid=False
+09:39:36 trial T150r1: rolling / bad-image-after-abort / auto
+09:39:37 reset: deleting old ReplicaSet mttr-app-548c44b595
+09:39:37 reset: deleting old ReplicaSet mttr-app-5d4fc846b8
+09:39:43   setup-release 
+09:40:36   setup-revert 
+09:40:40   setup-done {"hash": "5c7644bdbc", "annotation_kept": false}
+09:41:10   trial-start 
+09:41:10   commit-release {"release": "T150r1"}
+09:41:15   release-applied {"hash": "7cfbc94bcb"}
+09:41:17   fault-confirmed 
+09:42:46   operator-sees-failure {"reason": "rollout aborted"}
+09:43:31   operator-revert-commit 
+09:44:06   trial-end 
+09:44:07 trial T150r1: MTTR_full=141.2s MTTR_service=0.0s trigger=deadline latency=90.6s valid=False
+09:44:07 trial T183r1: rolling / bad-image-after-abort / auto
+09:44:07 reset: deleting old ReplicaSet mttr-app-5c7644bdbc
+09:44:07 reset: deleting old ReplicaSet mttr-app-7cfbc94bcb
+09:44:14   setup-release 
+09:45:07   setup-revert 
+09:45:13   setup-done {"hash": "7779745595", "annotation_kept": false}
+09:45:43   trial-start 
+09:45:43   commit-release {"release": "T183r1"}
+09:45:48   release-applied {"hash": "75879b9dd8"}
+09:45:49   fault-confirmed 
+09:47:19   operator-sees-failure {"reason": "rollout aborted"}
+09:48:04   operator-revert-commit 
+09:48:39   trial-end 
+09:48:39 trial T183r1: MTTR_full=141.4s MTTR_service=0.0s trigger=deadline latency=90.9s valid=False
+09:48:39 trial T234r1: rolling / bad-image-after-abort / auto
+09:48:40 reset: deleting old ReplicaSet mttr-app-75879b9dd8
+09:48:40 reset: deleting old ReplicaSet mttr-app-7779745595
+09:48:47   setup-release 
+09:49:54   setup-revert 
+09:49:59   setup-done {"hash": "5b476b78b4", "annotation_kept": false}
+09:50:29   trial-start 
+09:50:29   commit-release {"release": "T234r1"}
+09:50:35   release-applied {"hash": "64f6fbbb7"}
+09:50:36   fault-confirmed 
+09:52:05   operator-sees-failure {"reason": "rollout aborted"}
+09:52:50   operator-revert-commit 
+09:53:26   trial-end 
+09:53:26 trial T234r1: MTTR_full=141.4s MTTR_service=0.0s trigger=deadline latency=90.2s valid=False

@@ -1,0 +1,53 @@
+[('T019r1', 'rolling', 'bad-image-after-abort'), ('T055r1', 'rolling', 'bad-image-after-abort'), ('T080r1', 'canary', 'network-partition'), ('T083r1', 'rolling', 'bad-image-after-abort')]
+09:56:33 trial T019r1: rolling / bad-image-after-abort / auto
+09:56:34 reset: deleting old ReplicaSet mttr-app-5b476b78b4
+09:56:34 reset: deleting old ReplicaSet mttr-app-64f6fbbb7
+09:56:40   setup-release 
+09:57:32   setup-revert 
+09:57:36   setup-done {"hash": "76766fbf99", "annotation_kept": false}
+09:58:06   trial-start 
+09:58:06   commit-release {"release": "T019r1"}
+09:58:11   release-applied {"hash": "65848db976"}
+09:58:13   fault-confirmed 
+09:59:42   operator-sees-failure {"reason": "rollout aborted"}
+10:00:27   operator-revert-commit 
+10:01:03   trial-end 
+10:01:03 trial T019r1: MTTR_full=141.7s MTTR_service=0.0s trigger=deadline latency=90.4s valid=False
+10:01:03 trial T055r1: rolling / bad-image-after-abort / auto
+10:01:04 reset: deleting old ReplicaSet mttr-app-65848db976
+10:01:04 reset: deleting old ReplicaSet mttr-app-76766fbf99
+10:01:11   setup-release 
+10:02:03   setup-revert 
+10:02:07   setup-done {"hash": "6477bb89c5", "annotation_kept": false}
+10:02:37   trial-start 
+10:02:37   commit-release {"release": "T055r1"}
+10:02:42   release-applied {"hash": "56ffb87776"}
+10:02:44   fault-confirmed 
+10:04:13   operator-sees-failure {"reason": "rollout aborted"}
+10:04:58   operator-revert-commit 
+10:05:33   trial-end 
+10:05:33 trial T055r1: MTTR_full=141.2s MTTR_service=0.0s trigger=deadline latency=90.6s valid=False
+10:05:33 trial T080r1: canary / network-partition / auto
+10:05:34 reset: deleting old ReplicaSet mttr-app-646bbbdc8b
+10:06:11   trial-start 
+10:06:11   commit-release {"release": "T080r1"}
+10:06:18   chaos-created {"TARGET_HASH": "6f89d75649"}
+10:06:19   fault-confirmed 
+10:07:18   operator-sees-failure {"reason": "rollout aborted"}
+10:08:03   operator-revert-commit 
+10:08:38   trial-end 
+10:08:38 trial T080r1: MTTR_full=109.5s MTTR_service=62.2s trigger=analysis latency=59.3s valid=True
+10:08:38 trial T083r1: rolling / bad-image-after-abort / auto
+10:08:39 reset: deleting old ReplicaSet mttr-app-56ffb87776
+10:08:39 reset: deleting old ReplicaSet mttr-app-6477bb89c5
+10:08:46   setup-release 
+10:09:38   setup-revert 
+10:09:42   setup-done {"hash": "79655649b4", "annotation_kept": false}
+10:10:12   trial-start 
+10:10:12   commit-release {"release": "T083r1"}
+10:10:17   release-applied {"hash": "844b6df4bc"}
+10:10:19   fault-confirmed 
+10:11:48   operator-sees-failure {"reason": "rollout aborted"}
+10:12:33   operator-revert-commit 
+10:13:08   trial-end 
+10:13:08 trial T083r1: MTTR_full=141.0s MTTR_service=0.0s trigger=deadline latency=90.3s valid=False

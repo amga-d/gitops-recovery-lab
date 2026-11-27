@@ -1,0 +1,2390 @@
+{
+ "seed": 20261026,
+ "reps": 7,
+ "design": "experiment/design.yaml",
+ "cells": [
+  {
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  }
+ ],
+ "created": 1792922235.242907,
+ "trials": [
+  {
+   "trial_id": "T001",
+   "rep": 1,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T002",
+   "rep": 1,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T003",
+   "rep": 1,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T004",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T005",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T006",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T007",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T008",
+   "rep": 1,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T009",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T010",
+   "rep": 1,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T011",
+   "rep": 1,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T012",
+   "rep": 1,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T013",
+   "rep": 1,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T014",
+   "rep": 1,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T015",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T016",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T017",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T018",
+   "rep": 1,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T019",
+   "rep": 1,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T020",
+   "rep": 1,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T021",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T022",
+   "rep": 1,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T023",
+   "rep": 1,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T024",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T025",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T026",
+   "rep": 1,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T027",
+   "rep": 1,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T028",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T029",
+   "rep": 1,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T030",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T031",
+   "rep": 1,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T032",
+   "rep": 1,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T033",
+   "rep": 1,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T034",
+   "rep": 1,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T035",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T036",
+   "rep": 2,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T037",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T038",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T039",
+   "rep": 2,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T040",
+   "rep": 2,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T041",
+   "rep": 2,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T042",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T043",
+   "rep": 2,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T044",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T045",
+   "rep": 2,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T046",
+   "rep": 2,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T047",
+   "rep": 2,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T048",
+   "rep": 2,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T049",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T050",
+   "rep": 2,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T051",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T052",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T053",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T054",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T055",
+   "rep": 2,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T056",
+   "rep": 2,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T057",
+   "rep": 2,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T058",
+   "rep": 2,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T059",
+   "rep": 2,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T060",
+   "rep": 2,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T061",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T062",
+   "rep": 2,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T063",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T064",
+   "rep": 2,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T065",
+   "rep": 2,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T066",
+   "rep": 2,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T067",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T068",
+   "rep": 2,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T069",
+   "rep": 3,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T070",
+   "rep": 3,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T071",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T072",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T073",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T074",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T075",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T076",
+   "rep": 3,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T077",
+   "rep": 3,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T078",
+   "rep": 3,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T079",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T080",
+   "rep": 3,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T081",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T082",
+   "rep": 3,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T083",
+   "rep": 3,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T084",
+   "rep": 3,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T085",
+   "rep": 3,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T086",
+   "rep": 3,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T087",
+   "rep": 3,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T088",
+   "rep": 3,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T089",
+   "rep": 3,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T090",
+   "rep": 3,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T091",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T092",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T093",
+   "rep": 3,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T094",
+   "rep": 3,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T095",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T096",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T097",
+   "rep": 3,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T098",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T099",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T100",
+   "rep": 3,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T101",
+   "rep": 3,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T102",
+   "rep": 3,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T103",
+   "rep": 4,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T104",
+   "rep": 4,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T105",
+   "rep": 4,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T106",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T107",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T108",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T109",
+   "rep": 4,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T110",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T111",
+   "rep": 4,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T112",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T113",
+   "rep": 4,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T114",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T115",
+   "rep": 4,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T116",
+   "rep": 4,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T117",
+   "rep": 4,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T118",
+   "rep": 4,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T119",
+   "rep": 4,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T120",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T121",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T122",
+   "rep": 4,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T123",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T124",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T125",
+   "rep": 4,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T126",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T127",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T128",
+   "rep": 4,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T129",
+   "rep": 4,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T130",
+   "rep": 4,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T131",
+   "rep": 4,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T132",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T133",
+   "rep": 4,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T134",
+   "rep": 4,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T135",
+   "rep": 4,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T136",
+   "rep": 4,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T137",
+   "rep": 5,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T138",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T139",
+   "rep": 5,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T140",
+   "rep": 5,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T141",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T142",
+   "rep": 5,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T143",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T144",
+   "rep": 5,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T145",
+   "rep": 5,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T146",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T147",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T148",
+   "rep": 5,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T149",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T150",
+   "rep": 5,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T151",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T152",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T153",
+   "rep": 5,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T154",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T155",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T156",
+   "rep": 5,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T157",
+   "rep": 5,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T158",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T159",
+   "rep": 5,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T160",
+   "rep": 5,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T161",
+   "rep": 5,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T162",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T163",
+   "rep": 5,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T164",
+   "rep": 5,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T165",
+   "rep": 5,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T166",
+   "rep": 5,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T167",
+   "rep": 5,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T168",
+   "rep": 5,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T169",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T170",
+   "rep": 5,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T171",
+   "rep": 6,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T172",
+   "rep": 6,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T173",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T174",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T175",
+   "rep": 6,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T176",
+   "rep": 6,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T177",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T178",
+   "rep": 6,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T179",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T180",
+   "rep": 6,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T181",
+   "rep": 6,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T182",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T183",
+   "rep": 6,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T184",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T185",
+   "rep": 6,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T186",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T187",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T188",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T189",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T190",
+   "rep": 6,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T191",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T192",
+   "rep": 6,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T193",
+   "rep": 6,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T194",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T195",
+   "rep": 6,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T196",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T197",
+   "rep": 6,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T198",
+   "rep": 6,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T199",
+   "rep": 6,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T200",
+   "rep": 6,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T201",
+   "rep": 6,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T202",
+   "rep": 6,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T203",
+   "rep": 6,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T204",
+   "rep": 6,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T205",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T206",
+   "rep": 7,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T207",
+   "rep": 7,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T208",
+   "rep": 7,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T209",
+   "rep": 7,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T210",
+   "rep": 7,
+   "block": "revert-path",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "poll"
+  },
+  {
+   "trial_id": "T211",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T212",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T213",
+   "rep": 7,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T214",
+   "rep": 7,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T215",
+   "rep": 7,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T216",
+   "rep": 7,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T217",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T218",
+   "rep": 7,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "crashloop",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T219",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T220",
+   "rep": 7,
+   "block": "core",
+   "strategy": "bluegreen",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T221",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T222",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "canary",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T223",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-argocd-gitea-revert",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T224",
+   "rep": 7,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "network-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T225",
+   "rep": 7,
+   "block": "history",
+   "strategy": "bluegreen",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T226",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T227",
+   "rep": 7,
+   "block": "history",
+   "strategy": "canary",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T228",
+   "rep": 7,
+   "block": "core",
+   "strategy": "rolling",
+   "scenario": "faulty-release",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T229",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "bluegreen",
+   "scenario": "cp-rollouts-prometheus-faulty",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T230",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "rolling",
+   "scenario": "cp-rollouts-prometheus-faulty-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T231",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "bluegreen",
+   "scenario": "config-drift",
+   "sync_policy": "manual",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T232",
+   "rep": 7,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-crash",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T233",
+   "rep": 7,
+   "block": "core",
+   "strategy": "canary",
+   "scenario": "bad-image",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T234",
+   "rep": 7,
+   "block": "history",
+   "strategy": "rolling",
+   "scenario": "bad-image-after-abort",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T235",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy-long",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T236",
+   "rep": 7,
+   "block": "control-path",
+   "strategy": "canary",
+   "scenario": "cp-rollouts-prometheus-healthy",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T237",
+   "rep": 7,
+   "block": "drift",
+   "strategy": "rolling",
+   "scenario": "config-drift",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  },
+  {
+   "trial_id": "T238",
+   "rep": 7,
+   "block": "baselines",
+   "strategy": "canary",
+   "scenario": "control-stable-partition",
+   "sync_policy": "auto",
+   "revert_path": "webhook"
+  }
+ ]
+}
